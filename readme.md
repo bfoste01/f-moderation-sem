@@ -5,6 +5,8 @@
 	- The specific dataset will not be listed here until the paper is under agreement for publication.  
 ## MPlus Scripts
 
+## File Organization
+
 - All the files for invariance testing are located in the 'invariance' subfolder
 	- **Important.** The minimal requirement of weak invariance is needed for these models.
 - The 'weighted' folder contains all phases of model testing, specifying the complex survey design in all models. 
