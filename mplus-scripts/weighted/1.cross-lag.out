@@ -1,0 +1,1584 @@
+Mplus VERSION 7.3
+MUTHEN & MUTHEN
+10/23/2014   9:44 AM
+
+INPUT INSTRUCTIONS
+
+  TITLE:
+      Cross-lag model, no controls, no problem BeH
+    DATA: FILE = "moderation.4.dat";
+    DEFINE: A1PPVT4W = A1PPVT4W/10;
+            A1WJLWW = A1WJLWW/10;
+            A2PPVT4W = A2PPVT4W/10;
+            A2WJLWW = A2WJLWW/10;
+            A3PPVT4W = A3PPVT4W/10;
+            A3WJLWW = A3WJLWW/10;
+    VARIABLE:
+    NAMES = A1PPVT4W A1WJAPW A1WJLWW A1CSR A1ECMIRT A1WJSW R1ATTUDE R1MOTIVE R1PRSIST
+         A2PPVT4W A2WJAPW A2WJLWW A2CSR A2ECMIRT A2WJSW R2ATTUDE R2MOTIVE R2PRSIST
+         A3PPVT4W A3WJAPW A3WJLWW A3CSR A3ECMIRT A3WJSW KR3ATUDE KR3MOTIV KR3PRSST
+         R1TPLBS R2TPLBS KR3TPLBS STRAT PSU PRA12OTW CHGENDER P1RMOMED A1CAGE A2CAGE
+         A3CAGE CRACE P1PRGTYP P2PRGTYP P3PRGTYP O2CLSSCD O2CLSSIS O2CLSSLM O2CLSSQF
+         CLS1_ID CLS2_ID CLS3_ID R1BAGGR R1BWITH R1BHYPER R1ATTUDE_1 R2BAGGR R2BWITH
+         R2BHYPER KR3BAGGR KR3BHYPE KR3BWITH BINAGGR1 BINWITH1 BINHYP1 BINAGGR2 BINWITH2
+         BINHYP2 BINAGGR3 BINWITH3 BINHYP3;
+    USEVARIABLES = A1PPVT4W A1WJAPW A1CSR
+         R1ATTUDE R1MOTIVE R1PRSIST
+         A2PPVT4W A2WJAPW A2CSR
+         R2ATTUDE R2MOTIVE R2PRSIST
+         A3PPVT4W A3WJAPW A3CSR
+         KR3ATUDE KR3MOTIV KR3PRSST
+         STRAT PSU PRA12OTW;
+    STRATIFICATION = STRAT;
+    CLUSTER = PSU;
+    WEIGHT = PRA12OTW;
+    MISSING=.;
+    ANALYSIS:
+      TYPE = COMPLEX;
+      ITERATIONS = 10000;
+      ESTIMATOR = MLR;
+      PROCESSORS = 5;
+    MODEL:
+      cog1 BY A1WJAPW*(1)
+      A1PPVT4W(2)
+      A1CSR(3);
+      cog2 BY A2WJAPW*(1)
+      A2PPVT4W(2)
+      A2CSR(3);
+      cog3 BY A3WJAPW*(1)
+      A3PPVT4W(2)
+      A3CSR(3);
+      cog1@1.0;
+
+      atl1 BY R1ATTUDE*(4)
+      R1MOTIVE(5)
+      R1PRSIST(6);
+      atl2 BY R2ATTUDE*(4)
+      R2MOTIVE(5)
+      R2PRSIST(6);
+      atl3 BY KR3ATUDE*(4)
+      KR3MOTIV(5)
+      KR3PRSST(6);
+      atl1@1.0;
+
+      !allow some correlated residuals
+      !auto-correlations
+      A1WJAPW WITH A2WJAPW A3WJAPW;
+      A2WJAPW WITH A3WJAPW;
+      A1PPVT4W WITH A2PPVT4W A3PPVT4W;
+      A2PPVT4W WITH A3PPVT4W;
+      A1CSR WITH A2CSR A3CSR;
+      A2CSR WITH A3CSR;
+      R1ATTUDE WITH R2ATTUDE KR3ATUDE;
+      R2ATTUDE WITH KR3ATUDE;
+      R1MOTIVE WITH R2MOTIVE KR3MOTIV;
+      R2MOTIVE WITH KR3MOTIV;
+      R1PRSIST WITH R2PRSIST KR3PRSST;
+      R2PRSIST WITH KR3PRSST;
+
+     !allowing only concurrent non-directional paths
+      atl1 WITH cog1;
+      atl2 WITH cog2;
+      atl3 WITH cog3;
+
+     !cross-lagged paths
+      cog2 ON cog1;
+      atl2 ON cog1;
+      atl2 ON atl1;
+      cog2 ON atl1;
+      cog3 ON cog2;
+      cog3 ON atl2;
+      atl3 ON cog2;
+      atl3 ON atl2;
+
+
+      OUTPUT:
+        TECH1
+        SAMPSTAT
+        modindices;
+        STANDARDIZED;
+
+
+
+
+INPUT READING TERMINATED NORMALLY
+
+
+
+
+Cross-lag model, no controls, no problem BeH
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                         621
+
+Number of dependent variables                                   18
+Number of independent variables                                  0
+Number of continuous latent variables                            6
+
+Observed dependent variables
+
+  Continuous
+   A1PPVT4W    A1WJAPW     A1CSR       R1ATTUDE    R1MOTIVE    R1PRSIST
+   A2PPVT4W    A2WJAPW     A2CSR       R2ATTUDE    R2MOTIVE    R2PRSIST
+   A3PPVT4W    A3WJAPW     A3CSR       KR3ATUDE    KR3MOTIV    KR3PRSST
+
+Continuous latent variables
+   COG1        COG2        COG3        ATL1        ATL2        ATL3
+
+Variables with special functions
+
+  Stratification        STRAT
+  Cluster variable      PSU
+  Weight variable       PRA12OTW
+
+Estimator                                                      MLR
+Information matrix                                        OBSERVED
+Maximum number of iterations                                 10000
+Convergence criterion                                    0.500D-04
+Maximum number of steepest descent iterations                   20
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+
+Input data file(s)
+  moderation.4.dat
+
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns            36
+     Number of strata                      14
+     Number of clusters                    60
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+
+     PROPORTION OF DATA PRESENT
+
+
+           Covariance Coverage
+              A1PPVT4W      A1WJAPW       A1CSR         R1ATTUDE      R1MOTIVE
+              ________      ________      ________      ________      ________
+ A1PPVT4W       0.979
+ A1WJAPW        0.944         0.944
+ A1CSR          0.979         0.944         0.979
+ R1ATTUDE       0.944         0.910         0.944         0.961
+ R1MOTIVE       0.944         0.910         0.944         0.961         0.961
+ R1PRSIST       0.944         0.910         0.944         0.961         0.961
+ A2PPVT4W       0.961         0.926         0.961         0.942         0.942
+ A2WJAPW        0.953         0.921         0.953         0.934         0.934
+ A2CSR          0.966         0.931         0.966         0.947         0.947
+ R2ATTUDE       0.926         0.890         0.926         0.921         0.921
+ R2MOTIVE       0.926         0.890         0.926         0.921         0.921
+ R2PRSIST       0.926         0.890         0.926         0.921         0.921
+ A3PPVT4W       0.865         0.831         0.865         0.845         0.845
+ A3WJAPW        0.862         0.828         0.862         0.842         0.842
+ A3CSR          0.865         0.831         0.865         0.845         0.845
+ KR3ATUDE       0.676         0.657         0.676         0.667         0.667
+ KR3MOTIV       0.676         0.657         0.676         0.667         0.667
+ KR3PRSST       0.676         0.657         0.676         0.667         0.667
+
+
+           Covariance Coverage
+              R1PRSIST      A2PPVT4W      A2WJAPW       A2CSR         R2ATTUDE
+              ________      ________      ________      ________      ________
+ R1PRSIST       0.961
+ A2PPVT4W       0.942         0.979
+ A2WJAPW        0.934         0.968         0.971
+ A2CSR          0.947         0.979         0.971         0.984
+ R2ATTUDE       0.921         0.928         0.919         0.932         0.947
+ R2MOTIVE       0.921         0.928         0.919         0.932         0.947
+ R2PRSIST       0.921         0.928         0.919         0.932         0.947
+ A3PPVT4W       0.845         0.862         0.855         0.866         0.837
+ A3WJAPW        0.842         0.858         0.852         0.863         0.836
+ A3CSR          0.845         0.862         0.855         0.866         0.837
+ KR3ATUDE       0.667         0.668         0.663         0.671         0.647
+ KR3MOTIV       0.667         0.668         0.663         0.671         0.647
+ KR3PRSST       0.667         0.668         0.663         0.671         0.647
+
+
+           Covariance Coverage
+              R2MOTIVE      R2PRSIST      A3PPVT4W      A3WJAPW       A3CSR
+              ________      ________      ________      ________      ________
+ R2MOTIVE       0.947
+ R2PRSIST       0.947         0.947
+ A3PPVT4W       0.837         0.837         0.882
+ A3WJAPW        0.836         0.836         0.879         0.879
+ A3CSR          0.837         0.837         0.882         0.879         0.882
+ KR3ATUDE       0.647         0.647         0.589         0.586         0.589
+ KR3MOTIV       0.647         0.647         0.589         0.586         0.589
+ KR3PRSST       0.647         0.647         0.589         0.586         0.589
+
+
+           Covariance Coverage
+              KR3ATUDE      KR3MOTIV      KR3PRSST
+              ________      ________      ________
+ KR3ATUDE       0.683
+ KR3MOTIV       0.683         0.683
+ KR3PRSST       0.683         0.683         0.683
+
+
+SAMPLE STATISTICS
+
+
+     ESTIMATED SAMPLE STATISTICS
+
+
+           Means
+              A1PPVT4W      A1WJAPW       A1CSR         R1ATTUDE      R1MOTIVE
+              ________      ________      ________      ________      ________
+      1        10.845       381.705        63.253        51.947        52.518
+
+
+           Means
+              R1PRSIST      A2PPVT4W      A2WJAPW       A2CSR         R2ATTUDE
+              ________      ________      ________      ________      ________
+      1        52.295        11.844       399.238        62.104        52.374
+
+
+           Means
+              R2MOTIVE      R2PRSIST      A3PPVT4W      A3WJAPW       A3CSR
+              ________      ________      ________      ________      ________
+      1        52.808        52.681        13.552       427.042        65.938
+
+
+           Means
+              KR3ATUDE      KR3MOTIV      KR3PRSST
+              ________      ________      ________
+      1        50.708        50.250        49.368
+
+
+           Covariances
+              A1PPVT4W      A1WJAPW       A1CSR         R1ATTUDE      R1MOTIVE
+              ________      ________      ________      ________      ________
+ A1PPVT4W       2.671
+ A1WJAPW       11.768       616.079
+ A1CSR         12.027       107.833       300.333
+ R1ATTUDE       2.344        27.844        38.475        77.991
+ R1MOTIVE       3.625        38.990        25.205        41.182        85.624
+ R1PRSIST       3.696        43.959        49.753        62.675        48.344
+ A2PPVT4W       1.593         9.664         7.549         1.811         3.129
+ A2WJAPW       19.175       197.675       119.998        31.766        47.412
+ A2CSR          7.646        82.987       109.665        40.713        28.611
+ R2ATTUDE       1.640        12.963        38.807        48.506        25.086
+ R2MOTIVE       3.398        35.455        49.551        33.514        49.049
+ R2PRSIST       3.144        28.740        54.938        45.242        30.264
+ A3PPVT4W       1.263         7.764         6.904         1.904         2.962
+ A3WJAPW       16.726       151.850       110.062        37.663        56.272
+ A3CSR          7.016        54.291        84.558        44.337        28.295
+ KR3ATUDE       2.382         2.047        41.641        32.325        15.377
+ KR3MOTIV       4.818        55.606        50.552        27.041        36.093
+ KR3PRSST       5.140        38.207        68.265        32.474        21.057
+
+
+           Covariances
+              R1PRSIST      A2PPVT4W      A2WJAPW       A2CSR         R2ATTUDE
+              ________      ________      ________      ________      ________
+ R1PRSIST      84.322
+ A2PPVT4W       3.080         2.023
+ A2WJAPW       54.991        18.194       395.945
+ A2CSR         49.244         7.941       119.311       294.414
+ R2ATTUDE      44.161         1.704        23.613        48.126        86.504
+ R2MOTIVE      41.100         2.858        45.936        45.364        53.738
+ R2PRSIST      56.091         2.799        47.297        52.609        67.517
+ A3PPVT4W       2.797         1.352        13.786         7.160         2.248
+ A3WJAPW       52.323        15.990       270.793       115.686        34.156
+ A3CSR         55.328         5.636        98.335       103.277        46.019
+ KR3ATUDE      35.311         1.333        41.001        38.870        29.007
+ KR3MOTIV      38.303         2.991        68.404        43.415        19.746
+ KR3PRSST      41.520         3.290        74.554        63.876        30.656
+
+
+           Covariances
+              R2MOTIVE      R2PRSIST      A3PPVT4W      A3WJAPW       A3CSR
+              ________      ________      ________      ________      ________
+ R2MOTIVE      93.668
+ R2PRSIST      61.764        88.411
+ A3PPVT4W       3.112         2.448         1.907
+ A3WJAPW       56.175        48.889        17.082       459.799
+ A3CSR         50.955        49.170         6.473       101.129       293.370
+ KR3ATUDE      19.787        30.974         1.998        40.847        51.710
+ KR3MOTIV      35.270        27.986         3.673        71.087        51.183
+ KR3PRSST      24.852        37.474         3.135        80.149        61.285
+
+
+           Covariances
+              KR3ATUDE      KR3MOTIV      KR3PRSST
+              ________      ________      ________
+ KR3ATUDE      97.426
+ KR3MOTIV      72.748       137.366
+ KR3PRSST      85.376        90.168       127.689
+
+
+           Correlations
+              A1PPVT4W      A1WJAPW       A1CSR         R1ATTUDE      R1MOTIVE
+              ________      ________      ________      ________      ________
+ A1PPVT4W       1.000
+ A1WJAPW        0.290         1.000
+ A1CSR          0.425         0.251         1.000
+ R1ATTUDE       0.162         0.127         0.251         1.000
+ R1MOTIVE       0.240         0.170         0.157         0.504         1.000
+ R1PRSIST       0.246         0.193         0.313         0.773         0.569
+ A2PPVT4W       0.685         0.274         0.306         0.144         0.238
+ A2WJAPW        0.590         0.400         0.348         0.181         0.257
+ A2CSR          0.273         0.195         0.369         0.269         0.180
+ R2ATTUDE       0.108         0.056         0.241         0.591         0.291
+ R2MOTIVE       0.215         0.148         0.295         0.392         0.548
+ R2PRSIST       0.205         0.123         0.337         0.545         0.348
+ A3PPVT4W       0.559         0.226         0.288         0.156         0.232
+ A3WJAPW        0.477         0.285         0.296         0.199         0.284
+ A3CSR          0.251         0.128         0.285         0.293         0.179
+ KR3ATUDE       0.148         0.008         0.243         0.371         0.168
+ KR3MOTIV       0.252         0.191         0.249         0.261         0.333
+ KR3PRSST       0.278         0.136         0.349         0.325         0.201
+
+
+           Correlations
+              R1PRSIST      A2PPVT4W      A2WJAPW       A2CSR         R2ATTUDE
+              ________      ________      ________      ________      ________
+ R1PRSIST       1.000
+ A2PPVT4W       0.236         1.000
+ A2WJAPW        0.301         0.643         1.000
+ A2CSR          0.313         0.325         0.349         1.000
+ R2ATTUDE       0.517         0.129         0.128         0.302         1.000
+ R2MOTIVE       0.462         0.208         0.239         0.273         0.597
+ R2PRSIST       0.650         0.209         0.253         0.326         0.772
+ A3PPVT4W       0.221         0.688         0.502         0.302         0.175
+ A3WJAPW        0.266         0.524         0.635         0.314         0.171
+ A3CSR          0.352         0.231         0.289         0.351         0.289
+ KR3ATUDE       0.390         0.095         0.209         0.230         0.316
+ KR3MOTIV       0.356         0.179         0.293         0.216         0.181
+ KR3PRSST       0.400         0.205         0.332         0.329         0.292
+
+
+           Correlations
+              R2MOTIVE      R2PRSIST      A3PPVT4W      A3WJAPW       A3CSR
+              ________      ________      ________      ________      ________
+ R2MOTIVE       1.000
+ R2PRSIST       0.679         1.000
+ A3PPVT4W       0.233         0.189         1.000
+ A3WJAPW        0.271         0.242         0.577         1.000
+ A3CSR          0.307         0.305         0.274         0.275         1.000
+ KR3ATUDE       0.207         0.334         0.147         0.193         0.306
+ KR3MOTIV       0.311         0.254         0.227         0.283         0.255
+ KR3PRSST       0.227         0.353         0.201         0.331         0.317
+
+
+           Correlations
+              KR3ATUDE      KR3MOTIV      KR3PRSST
+              ________      ________      ________
+ KR3ATUDE       1.000
+ KR3MOTIV       0.629         1.000
+ KR3PRSST       0.765         0.681         1.000
+
+
+     MAXIMUM LOG-LIKELIHOOD VALUE FOR THE UNRESTRICTED (H1) MODEL IS -33802.746
+
+
+UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     A1PPVT4W             10.847      -0.557       3.700    0.16%       9.400     10.500     11.000
+             608.000       2.664       0.548      14.600    0.16%      11.300     12.200
+     A1WJAPW             382.158      -0.360     332.000    8.53%     359.000    377.000    382.000
+             586.000     612.105      -0.390     444.000    0.17%     388.000    403.000
+     A1CSR                63.208      -1.042       0.000    0.16%      50.000     60.000     65.000
+             608.000     300.451       0.586      81.000   14.14%      71.000     79.000
+     R1ATTUDE             51.947      -1.019      17.780    0.17%      45.170     53.000     53.000
+             597.000      78.419       0.437      60.830   29.82%      56.910     60.830
+     R1MOTIVE             52.577      -1.360       7.130    0.17%      46.570     51.820     54.450
+             597.000      85.859       2.230      62.340   17.92%      57.080     59.710
+     R1PRSIST             52.315      -1.032      15.280    0.17%      43.620     51.350     53.920
+             597.000      84.946       0.510      61.650   22.45%      56.500     61.650
+     A2PPVT4W             11.850      -0.299       5.700    0.16%      10.600     11.500     11.900
+             608.000       2.019       0.449      16.100    0.16%      12.200     13.100
+     A2WJAPW             399.680      -0.514     332.000    1.49%     388.000    393.000    403.000
+             603.000     384.780       1.239     458.000    0.17%     407.000    415.000
+     A2CSR                62.124      -0.690       4.000    0.16%      47.000     56.000     63.000
+             611.000     294.331      -0.298      81.000   16.20%      71.000     79.000
+     R2ATTUDE             52.435      -1.294      13.860    0.17%      45.170     53.000     56.910
+             588.000      85.497       1.308      60.830   30.95%      56.910     60.830
+     R2MOTIVE             52.908      -1.233      12.390    0.17%      43.940     51.820     54.450
+             588.000      93.270       1.161      62.340   23.13%      57.080     62.340
+     R2PRSIST             52.741      -1.138      20.440    0.34%      43.620     53.920     56.500
+             588.000      87.325       0.676      61.650   26.87%      56.500     61.650
+     A3PPVT4W             13.538      -0.588       5.400    0.18%      12.600     13.200     13.500
+             548.000       1.910       2.523      17.000    0.18%      13.800     14.600
+     A3WJAPW             426.923      -0.685     332.000    0.18%     407.000    423.000    432.000
+             546.000     458.750       1.246     481.000    0.18%     436.000    444.000
+     A3CSR                65.926      -1.108       6.000    0.36%      53.000     68.000     74.000
+             548.000     292.390       0.313      81.000   25.36%      77.000     81.000
+     KR3ATUDE             50.896      -1.118      13.860    0.47%      45.170     53.000     53.000
+             424.000      94.978       0.979      60.830   28.54%      56.910     60.830
+     KR3MOTIV             50.350      -0.969       9.760    0.24%      41.310     51.820     54.450
+             424.000     135.407       0.195      62.340   23.11%      57.080     62.340
+     KR3PRSST             49.622      -0.700      20.440    0.71%      38.470     48.770     51.350
+             424.000     124.276      -0.465      61.650   27.59%      56.500     61.650
+
+
+THE MODEL ESTIMATION TERMINATED NORMALLY
+
+     THE STANDARD ERRORS OF THE MODEL PARAMETER ESTIMATES MAY NOT BE
+     TRUSTWORTHY FOR SOME PARAMETERS DUE TO A NON-POSITIVE DEFINITE
+     FIRST-ORDER DERIVATIVE PRODUCT MATRIX.  THIS MAY BE DUE TO THE STARTING
+     VALUES BUT MAY ALSO BE AN INDICATION OF MODEL NONIDENTIFICATION.  THE
+     CONDITION NUMBER IS      -0.744D-18.  PROBLEM INVOLVING THE FOLLOWING PARAMETER:
+     Parameter 47, A3WJAPW WITH A2WJAPW
+
+     THIS IS MOST LIKELY DUE TO HAVING MORE PARAMETERS THAN THE NUMBER
+     OF CLUSTERS MINUS THE NUMBER OF STRATA WITH MORE THAN ONE CLUSTER.
+
+
+
+
+MODEL FIT INFORMATION
+
+Number of Free Parameters                       75
+
+Loglikelihood
+
+          H0 Value                      -33990.041
+          H0 Scaling Correction Factor      2.0777
+            for MLR
+          H1 Value                      -33802.746
+          H1 Scaling Correction Factor      1.6847
+            for MLR
+
+Information Criteria
+
+          Akaike (AIC)                   68130.082
+          Bayesian (BIC)                 68462.432
+          Sample-Size Adjusted BIC       68224.319
+            (n* = (n + 2) / 24)
+
+Chi-Square Test of Model Fit
+
+          Value                            262.663*
+          Degrees of Freedom                   114
+          P-Value                           0.0000
+          Scaling Correction Factor         1.4261
+            for MLR
+
+*   The chi-square value for MLM, MLMV, MLR, ULSMV, WLSM and WLSMV cannot be used
+    for chi-square difference testing in the regular way.  MLM, MLR and WLSM
+    chi-square difference testing is described on the Mplus website.  MLMV, WLSMV,
+    and ULSMV difference testing is done using the DIFFTEST option.
+
+RMSEA (Root Mean Square Error Of Approximation)
+
+          Estimate                           0.046
+          90 Percent C.I.                    0.039  0.053
+          Probability RMSEA <= .05           0.822
+
+CFI/TLI
+
+          CFI                                0.952
+          TLI                                0.936
+
+Chi-Square Test of Model Fit for the Baseline Model
+
+          Value                           3281.760
+          Degrees of Freedom                   153
+          P-Value                           0.0000
+
+SRMR (Standardized Root Mean Square Residual)
+
+          Value                              0.142
+
+
+
+MODEL RESULTS
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ COG1     BY
+    A1WJAPW           16.211      1.002     16.176      0.000
+    A1PPVT4W           1.115      0.075     14.853      0.000
+    A1CSR              8.453      0.913      9.254      0.000
+
+ COG2     BY
+    A2WJAPW           16.211      1.002     16.176      0.000
+    A2PPVT4W           1.115      0.075     14.853      0.000
+    A2CSR              8.453      0.913      9.254      0.000
+
+ COG3     BY
+    A3WJAPW           16.211      1.002     16.176      0.000
+    A3PPVT4W           1.115      0.075     14.853      0.000
+    A3CSR              8.453      0.913      9.254      0.000
+
+ ATL1     BY
+    R1ATTUDE           7.068      0.289     24.445      0.000
+    R1MOTIVE           6.695      0.311     21.538      0.000
+    R1PRSIST           8.463      0.394     21.453      0.000
+
+ ATL2     BY
+    R2ATTUDE           7.068      0.289     24.445      0.000
+    R2MOTIVE           6.695      0.311     21.538      0.000
+    R2PRSIST           8.463      0.394     21.453      0.000
+
+ ATL3     BY
+    KR3ATUDE           7.068      0.289     24.445      0.000
+    KR3MOTIV           6.695      0.311     21.538      0.000
+    KR3PRSST           8.463      0.394     21.453      0.000
+
+ COG2     ON
+    COG1               0.868      0.097      8.945      0.000
+    ATL1               0.024      0.062      0.392      0.695
+
+ ATL2     ON
+    COG1               0.075      0.056      1.335      0.182
+    ATL1               0.699      0.053     13.236      0.000
+
+ COG3     ON
+    COG2               0.785      0.044     17.728      0.000
+    ATL2               0.071      0.040      1.782      0.075
+
+ ATL3     ON
+    COG2               0.353      0.105      3.361      0.001
+    ATL2               0.344      0.083      4.133      0.000
+
+ ATL1     WITH
+    COG1               0.432      0.047      9.218      0.000
+
+ ATL2     WITH
+    COG2               0.011      0.032      0.329      0.742
+
+ ATL3     WITH
+    COG3               0.065      0.045      1.440      0.150
+
+ A1WJAPW  WITH
+    A2WJAPW           15.161     18.509      0.819      0.413
+    A3WJAPW           -3.022     30.435     -0.099      0.921
+
+ A2WJAPW  WITH
+    A3WJAPW           45.560     17.603      2.588      0.010
+
+ A1PPVT4W WITH
+    A2PPVT4W           0.460      0.084      5.455      0.000
+    A3PPVT4W           0.338      0.075      4.521      0.000
+
+ A2PPVT4W WITH
+    A3PPVT4W           0.458      0.052      8.804      0.000
+
+ A1CSR    WITH
+    A2CSR             47.834     13.963      3.426      0.001
+    A3CSR             29.844     18.451      1.617      0.106
+
+ A2CSR    WITH
+    A3CSR             50.831     16.811      3.024      0.002
+
+ R1ATTUDE WITH
+    R2ATTUDE          11.351      2.159      5.258      0.000
+    KR3ATUDE           6.589      2.182      3.020      0.003
+
+ R2ATTUDE WITH
+    KR3ATUDE           5.691      2.337      2.435      0.015
+
+ R1MOTIVE WITH
+    R2MOTIVE          25.197      3.879      6.496      0.000
+    KR3MOTIV          16.940      4.493      3.771      0.000
+
+ R2MOTIVE WITH
+    KR3MOTIV          17.545      3.510      4.999      0.000
+
+ R1PRSIST WITH
+    R2PRSIST           3.076      3.187      0.965      0.334
+    KR3PRSST          -1.608      2.624     -0.613      0.540
+
+ R2PRSIST WITH
+    KR3PRSST          -1.302      2.572     -0.506      0.613
+
+ Intercepts
+    A1PPVT4W          10.844      0.089    122.103      0.000
+    A1WJAPW          381.449      1.672    228.145      0.000
+    A1CSR             63.212      0.840     75.209      0.000
+    R1ATTUDE          51.942      0.340    152.973      0.000
+    R1MOTIVE          52.534      0.412    127.627      0.000
+    R1PRSIST          52.294      0.389    134.432      0.000
+    A2PPVT4W          11.844      0.099    119.994      0.000
+    A2WJAPW          399.197      1.226    325.478      0.000
+    A2CSR             62.109      1.035     59.987      0.000
+    R2ATTUDE          52.345      0.544     96.208      0.000
+    R2MOTIVE          52.785      0.588     89.731      0.000
+    R2PRSIST          52.656      0.577     91.262      0.000
+    A3PPVT4W          13.547      0.096    141.053      0.000
+    A3WJAPW          426.999      1.313    325.146      0.000
+    A3CSR             65.989      1.284     51.392      0.000
+    KR3ATUDE          50.695      0.548     92.502      0.000
+    KR3MOTIV          50.352      0.753     66.841      0.000
+    KR3PRSST          49.370      0.723     68.314      0.000
+
+ Variances
+    COG1               1.000      0.000    999.000    999.000
+    ATL1               1.000      0.000    999.000    999.000
+
+ Residual Variances
+    A1PPVT4W           1.296      0.156      8.317      0.000
+    A1WJAPW          476.166     43.311     10.994      0.000
+    A1CSR            218.012     15.260     14.286      0.000
+    R1ATTUDE          25.252      2.264     11.153      0.000
+    R1MOTIVE          53.601      5.867      9.137      0.000
+    R1PRSIST          11.309      2.881      3.925      0.000
+    A2PPVT4W           0.892      0.057     15.773      0.000
+    A2WJAPW          130.557     15.900      8.211      0.000
+    A2CSR            231.569     17.228     13.442      0.000
+    R2ATTUDE          29.220      3.275      8.921      0.000
+    R2MOTIVE          45.133      3.951     11.425      0.000
+    R2PRSIST           8.801      5.049      1.743      0.081
+    A3PPVT4W           0.910      0.100      9.094      0.000
+    A3WJAPW          204.341     32.525      6.283      0.000
+    A3CSR            240.341     27.613      8.704      0.000
+    KR3ATUDE          28.632      3.659      7.825      0.000
+    KR3MOTIV          62.487      6.463      9.669      0.000
+    KR3PRSST          20.134      5.070      3.971      0.000
+    COG2               0.176      0.088      2.009      0.045
+    COG3               0.221      0.078      2.855      0.004
+    ATL2               0.590      0.066      8.957      0.000
+    ATL3               1.137      0.125      9.070      0.000
+
+
+STANDARDIZED MODEL RESULTS
+
+
+STDYX Standardization
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ COG1     BY
+    A1WJAPW            0.596      0.032     18.497      0.000
+    A1PPVT4W           0.700      0.036     19.491      0.000
+    A1CSR              0.497      0.049     10.077      0.000
+
+ COG2     BY
+    A2WJAPW            0.810      0.027     30.390      0.000
+    A2PPVT4W           0.754      0.026     28.781      0.000
+    A2CSR              0.476      0.039     12.128      0.000
+
+ COG3     BY
+    A3WJAPW            0.723      0.035     20.474      0.000
+    A3PPVT4W           0.733      0.031     23.388      0.000
+    A3CSR              0.449      0.040     11.164      0.000
+
+ ATL1     BY
+    R1ATTUDE           0.815      0.018     44.536      0.000
+    R1MOTIVE           0.675      0.029     22.971      0.000
+    R1PRSIST           0.929      0.020     47.123      0.000
+
+ ATL2     BY
+    R2ATTUDE           0.812      0.019     42.097      0.000
+    R2MOTIVE           0.727      0.026     27.577      0.000
+    R2PRSIST           0.950      0.030     31.863      0.000
+
+ ATL3     BY
+    KR3ATUDE           0.849      0.016     51.435      0.000
+    KR3MOTIV           0.717      0.027     26.187      0.000
+    KR3PRSST           0.916      0.024     38.854      0.000
+
+ COG2     ON
+    COG1               0.891      0.072     12.315      0.000
+    ATL1               0.025      0.064      0.389      0.697
+
+ ATL2     ON
+    COG1               0.070      0.052      1.348      0.178
+    ATL1               0.658      0.045     14.523      0.000
+
+ COG3     ON
+    COG2               0.829      0.048     17.296      0.000
+    ATL2               0.081      0.044      1.855      0.064
+
+ ATL3     ON
+    COG2               0.283      0.073      3.876      0.000
+    ATL2               0.301      0.072      4.171      0.000
+
+ ATL1     WITH
+    COG1               0.432      0.047      9.218      0.000
+
+ ATL2     WITH
+    COG2               0.033      0.098      0.337      0.736
+
+ ATL3     WITH
+    COG3               0.129      0.091      1.425      0.154
+
+ A1WJAPW  WITH
+    A2WJAPW            0.061      0.073      0.828      0.408
+    A3WJAPW           -0.010      0.098     -0.099      0.921
+
+ A2WJAPW  WITH
+    A3WJAPW            0.279      0.086      3.238      0.001
+
+ A1PPVT4W WITH
+    A2PPVT4W           0.428      0.065      6.616      0.000
+    A3PPVT4W           0.311      0.068      4.572      0.000
+
+ A2PPVT4W WITH
+    A3PPVT4W           0.508      0.036     14.060      0.000
+
+ A1CSR    WITH
+    A2CSR              0.213      0.056      3.805      0.000
+    A3CSR              0.130      0.078      1.665      0.096
+
+ A2CSR    WITH
+    A3CSR              0.215      0.060      3.581      0.000
+
+ R1ATTUDE WITH
+    R2ATTUDE           0.418      0.063      6.644      0.000
+    KR3ATUDE           0.245      0.081      3.035      0.002
+
+ R2ATTUDE WITH
+    KR3ATUDE           0.197      0.075      2.627      0.009
+
+ R1MOTIVE WITH
+    R2MOTIVE           0.512      0.045     11.362      0.000
+    KR3MOTIV           0.293      0.077      3.795      0.000
+
+ R2MOTIVE WITH
+    KR3MOTIV           0.330      0.059      5.613      0.000
+
+ R1PRSIST WITH
+    R2PRSIST           0.308      0.217      1.424      0.155
+    KR3PRSST          -0.107      0.179     -0.597      0.551
+
+ R2PRSIST WITH
+    KR3PRSST          -0.098      0.205     -0.477      0.633
+
+ Intercepts
+    A1PPVT4W           6.805      0.295     23.082      0.000
+    A1WJAPW           14.032      0.471     29.778      0.000
+    A1CSR              3.715      0.116     31.946      0.000
+    R1ATTUDE           5.990      0.188     31.897      0.000
+    R1MOTIVE           5.295      0.183     28.905      0.000
+    R1PRSIST           5.742      0.215     26.713      0.000
+    A2PPVT4W           8.231      0.271     30.373      0.000
+    A2WJAPW           20.487      0.751     27.267      0.000
+    A2CSR              3.590      0.121     29.684      0.000
+    R2ATTUDE           5.658      0.242     23.384      0.000
+    R2MOTIVE           5.396      0.204     26.385      0.000
+    R2PRSIST           5.562      0.238     23.411      0.000
+    A3PPVT4W           9.658      0.460     21.009      0.000
+    A3WJAPW           20.641      0.926     22.281      0.000
+    A3CSR              3.803      0.239     15.901      0.000
+    KR3ATUDE           5.012      0.237     21.165      0.000
+    KR3MOTIV           4.440      0.193     23.011      0.000
+    KR3PRSST           4.402      0.201     21.849      0.000
+
+ Variances
+    COG1               1.000      0.000    999.000    999.000
+    ATL1               1.000      0.000    999.000    999.000
+
+ Residual Variances
+    A1PPVT4W           0.511      0.050     10.166      0.000
+    A1WJAPW            0.644      0.038     16.757      0.000
+    A1CSR              0.753      0.049     15.374      0.000
+    R1ATTUDE           0.336      0.030     11.257      0.000
+    R1MOTIVE           0.545      0.040     13.736      0.000
+    R1PRSIST           0.136      0.037      3.721      0.000
+    A2PPVT4W           0.431      0.040     10.902      0.000
+    A2WJAPW            0.344      0.043      7.963      0.000
+    A2CSR              0.774      0.037     20.733      0.000
+    R2ATTUDE           0.341      0.031     10.912      0.000
+    R2MOTIVE           0.472      0.038     12.305      0.000
+    R2PRSIST           0.098      0.057      1.735      0.083
+    A3PPVT4W           0.463      0.046     10.068      0.000
+    A3WJAPW            0.477      0.051      9.355      0.000
+    A3CSR              0.798      0.036     22.068      0.000
+    KR3ATUDE           0.280      0.028      9.992      0.000
+    KR3MOTIV           0.486      0.039     12.373      0.000
+    KR3PRSST           0.160      0.043      3.702      0.000
+    COG2               0.186      0.093      1.995      0.046
+    COG3               0.260      0.074      3.500      0.000
+    ATL2               0.523      0.049     10.630      0.000
+    ATL3               0.771      0.055     14.077      0.000
+
+
+STDY Standardization
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ COG1     BY
+    A1WJAPW            0.596      0.032     18.497      0.000
+    A1PPVT4W           0.700      0.036     19.491      0.000
+    A1CSR              0.497      0.049     10.077      0.000
+
+ COG2     BY
+    A2WJAPW            0.810      0.027     30.390      0.000
+    A2PPVT4W           0.754      0.026     28.781      0.000
+    A2CSR              0.476      0.039     12.128      0.000
+
+ COG3     BY
+    A3WJAPW            0.723      0.035     20.474      0.000
+    A3PPVT4W           0.733      0.031     23.388      0.000
+    A3CSR              0.449      0.040     11.164      0.000
+
+ ATL1     BY
+    R1ATTUDE           0.815      0.018     44.536      0.000
+    R1MOTIVE           0.675      0.029     22.971      0.000
+    R1PRSIST           0.929      0.020     47.123      0.000
+
+ ATL2     BY
+    R2ATTUDE           0.812      0.019     42.097      0.000
+    R2MOTIVE           0.727      0.026     27.577      0.000
+    R2PRSIST           0.950      0.030     31.863      0.000
+
+ ATL3     BY
+    KR3ATUDE           0.849      0.016     51.435      0.000
+    KR3MOTIV           0.717      0.027     26.187      0.000
+    KR3PRSST           0.916      0.024     38.854      0.000
+
+ COG2     ON
+    COG1               0.891      0.072     12.315      0.000
+    ATL1               0.025      0.064      0.389      0.697
+
+ ATL2     ON
+    COG1               0.070      0.052      1.348      0.178
+    ATL1               0.658      0.045     14.523      0.000
+
+ COG3     ON
+    COG2               0.829      0.048     17.296      0.000
+    ATL2               0.081      0.044      1.855      0.064
+
+ ATL3     ON
+    COG2               0.283      0.073      3.876      0.000
+    ATL2               0.301      0.072      4.171      0.000
+
+ ATL1     WITH
+    COG1               0.432      0.047      9.218      0.000
+
+ ATL2     WITH
+    COG2               0.033      0.098      0.337      0.736
+
+ ATL3     WITH
+    COG3               0.129      0.091      1.425      0.154
+
+ A1WJAPW  WITH
+    A2WJAPW            0.061      0.073      0.828      0.408
+    A3WJAPW           -0.010      0.098     -0.099      0.921
+
+ A2WJAPW  WITH
+    A3WJAPW            0.279      0.086      3.238      0.001
+
+ A1PPVT4W WITH
+    A2PPVT4W           0.428      0.065      6.616      0.000
+    A3PPVT4W           0.311      0.068      4.572      0.000
+
+ A2PPVT4W WITH
+    A3PPVT4W           0.508      0.036     14.060      0.000
+
+ A1CSR    WITH
+    A2CSR              0.213      0.056      3.805      0.000
+    A3CSR              0.130      0.078      1.665      0.096
+
+ A2CSR    WITH
+    A3CSR              0.215      0.060      3.581      0.000
+
+ R1ATTUDE WITH
+    R2ATTUDE           0.418      0.063      6.644      0.000
+    KR3ATUDE           0.245      0.081      3.035      0.002
+
+ R2ATTUDE WITH
+    KR3ATUDE           0.197      0.075      2.627      0.009
+
+ R1MOTIVE WITH
+    R2MOTIVE           0.512      0.045     11.362      0.000
+    KR3MOTIV           0.293      0.077      3.795      0.000
+
+ R2MOTIVE WITH
+    KR3MOTIV           0.330      0.059      5.613      0.000
+
+ R1PRSIST WITH
+    R2PRSIST           0.308      0.217      1.424      0.155
+    KR3PRSST          -0.107      0.179     -0.597      0.551
+
+ R2PRSIST WITH
+    KR3PRSST          -0.098      0.205     -0.477      0.633
+
+ Intercepts
+    A1PPVT4W           6.805      0.295     23.082      0.000
+    A1WJAPW           14.032      0.471     29.778      0.000
+    A1CSR              3.715      0.116     31.946      0.000
+    R1ATTUDE           5.990      0.188     31.897      0.000
+    R1MOTIVE           5.295      0.183     28.905      0.000
+    R1PRSIST           5.742      0.215     26.713      0.000
+    A2PPVT4W           8.231      0.271     30.373      0.000
+    A2WJAPW           20.487      0.751     27.267      0.000
+    A2CSR              3.590      0.121     29.684      0.000
+    R2ATTUDE           5.658      0.242     23.384      0.000
+    R2MOTIVE           5.396      0.204     26.385      0.000
+    R2PRSIST           5.562      0.238     23.411      0.000
+    A3PPVT4W           9.658      0.460     21.009      0.000
+    A3WJAPW           20.641      0.926     22.281      0.000
+    A3CSR              3.803      0.239     15.901      0.000
+    KR3ATUDE           5.012      0.237     21.165      0.000
+    KR3MOTIV           4.440      0.193     23.011      0.000
+    KR3PRSST           4.402      0.201     21.849      0.000
+
+ Variances
+    COG1               1.000      0.000    999.000    999.000
+    ATL1               1.000      0.000    999.000    999.000
+
+ Residual Variances
+    A1PPVT4W           0.511      0.050     10.166      0.000
+    A1WJAPW            0.644      0.038     16.757      0.000
+    A1CSR              0.753      0.049     15.374      0.000
+    R1ATTUDE           0.336      0.030     11.257      0.000
+    R1MOTIVE           0.545      0.040     13.736      0.000
+    R1PRSIST           0.136      0.037      3.721      0.000
+    A2PPVT4W           0.431      0.040     10.902      0.000
+    A2WJAPW            0.344      0.043      7.963      0.000
+    A2CSR              0.774      0.037     20.733      0.000
+    R2ATTUDE           0.341      0.031     10.912      0.000
+    R2MOTIVE           0.472      0.038     12.305      0.000
+    R2PRSIST           0.098      0.057      1.735      0.083
+    A3PPVT4W           0.463      0.046     10.068      0.000
+    A3WJAPW            0.477      0.051      9.355      0.000
+    A3CSR              0.798      0.036     22.068      0.000
+    KR3ATUDE           0.280      0.028      9.992      0.000
+    KR3MOTIV           0.486      0.039     12.373      0.000
+    KR3PRSST           0.160      0.043      3.702      0.000
+    COG2               0.186      0.093      1.995      0.046
+    COG3               0.260      0.074      3.500      0.000
+    ATL2               0.523      0.049     10.630      0.000
+    ATL3               0.771      0.055     14.077      0.000
+
+
+STD Standardization
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ COG1     BY
+    A1WJAPW           16.211      1.002     16.176      0.000
+    A1PPVT4W           1.115      0.075     14.853      0.000
+    A1CSR              8.453      0.913      9.254      0.000
+
+ COG2     BY
+    A2WJAPW           15.784      0.904     17.464      0.000
+    A2PPVT4W           1.085      0.068     15.882      0.000
+    A2CSR              8.230      0.698     11.787      0.000
+
+ COG3     BY
+    A3WJAPW           14.953      0.833     17.949      0.000
+    A3PPVT4W           1.028      0.074     13.895      0.000
+    A3CSR              7.797      0.722     10.792      0.000
+
+ ATL1     BY
+    R1ATTUDE           7.068      0.289     24.445      0.000
+    R1MOTIVE           6.695      0.311     21.538      0.000
+    R1PRSIST           8.463      0.394     21.453      0.000
+
+ ATL2     BY
+    R2ATTUDE           7.508      0.327     22.965      0.000
+    R2MOTIVE           7.112      0.383     18.584      0.000
+    R2PRSIST           8.990      0.445     20.207      0.000
+
+ ATL3     BY
+    KR3ATUDE           8.585      0.387     22.185      0.000
+    KR3MOTIV           8.132      0.416     19.544      0.000
+    KR3PRSST          10.279      0.580     17.729      0.000
+
+ COG2     ON
+    COG1               0.891      0.072     12.315      0.000
+    ATL1               0.025      0.064      0.389      0.697
+
+ ATL2     ON
+    COG1               0.070      0.052      1.348      0.178
+    ATL1               0.658      0.045     14.523      0.000
+
+ COG3     ON
+    COG2               0.829      0.048     17.296      0.000
+    ATL2               0.081      0.044      1.855      0.064
+
+ ATL3     ON
+    COG2               0.283      0.073      3.876      0.000
+    ATL2               0.301      0.072      4.171      0.000
+
+ ATL1     WITH
+    COG1               0.432      0.047      9.218      0.000
+
+ ATL2     WITH
+    COG2               0.033      0.098      0.337      0.736
+
+ ATL3     WITH
+    COG3               0.129      0.091      1.425      0.154
+
+ A1WJAPW  WITH
+    A2WJAPW           15.161     18.509      0.819      0.413
+    A3WJAPW           -3.022     30.435     -0.099      0.921
+
+ A2WJAPW  WITH
+    A3WJAPW           45.560     17.603      2.588      0.010
+
+ A1PPVT4W WITH
+    A2PPVT4W           0.460      0.084      5.455      0.000
+    A3PPVT4W           0.338      0.075      4.521      0.000
+
+ A2PPVT4W WITH
+    A3PPVT4W           0.458      0.052      8.804      0.000
+
+ A1CSR    WITH
+    A2CSR             47.834     13.963      3.426      0.001
+    A3CSR             29.844     18.451      1.617      0.106
+
+ A2CSR    WITH
+    A3CSR             50.831     16.811      3.024      0.002
+
+ R1ATTUDE WITH
+    R2ATTUDE          11.351      2.159      5.258      0.000
+    KR3ATUDE           6.589      2.182      3.020      0.003
+
+ R2ATTUDE WITH
+    KR3ATUDE           5.691      2.337      2.435      0.015
+
+ R1MOTIVE WITH
+    R2MOTIVE          25.197      3.879      6.496      0.000
+    KR3MOTIV          16.940      4.493      3.771      0.000
+
+ R2MOTIVE WITH
+    KR3MOTIV          17.545      3.510      4.999      0.000
+
+ R1PRSIST WITH
+    R2PRSIST           3.076      3.187      0.965      0.334
+    KR3PRSST          -1.608      2.624     -0.613      0.540
+
+ R2PRSIST WITH
+    KR3PRSST          -1.302      2.572     -0.506      0.613
+
+ Intercepts
+    A1PPVT4W          10.844      0.089    122.103      0.000
+    A1WJAPW          381.449      1.672    228.145      0.000
+    A1CSR             63.212      0.840     75.209      0.000
+    R1ATTUDE          51.942      0.340    152.973      0.000
+    R1MOTIVE          52.534      0.412    127.627      0.000
+    R1PRSIST          52.294      0.389    134.432      0.000
+    A2PPVT4W          11.844      0.099    119.994      0.000
+    A2WJAPW          399.197      1.226    325.478      0.000
+    A2CSR             62.109      1.035     59.987      0.000
+    R2ATTUDE          52.345      0.544     96.208      0.000
+    R2MOTIVE          52.785      0.588     89.731      0.000
+    R2PRSIST          52.656      0.577     91.262      0.000
+    A3PPVT4W          13.547      0.096    141.053      0.000
+    A3WJAPW          426.999      1.313    325.146      0.000
+    A3CSR             65.989      1.284     51.392      0.000
+    KR3ATUDE          50.695      0.548     92.502      0.000
+    KR3MOTIV          50.352      0.753     66.841      0.000
+    KR3PRSST          49.370      0.723     68.314      0.000
+
+ Variances
+    COG1               1.000      0.000    999.000    999.000
+    ATL1               1.000      0.000    999.000    999.000
+
+ Residual Variances
+    A1PPVT4W           1.296      0.156      8.317      0.000
+    A1WJAPW          476.166     43.311     10.994      0.000
+    A1CSR            218.012     15.260     14.286      0.000
+    R1ATTUDE          25.252      2.264     11.153      0.000
+    R1MOTIVE          53.601      5.867      9.137      0.000
+    R1PRSIST          11.309      2.881      3.925      0.000
+    A2PPVT4W           0.892      0.057     15.773      0.000
+    A2WJAPW          130.557     15.900      8.211      0.000
+    A2CSR            231.569     17.228     13.442      0.000
+    R2ATTUDE          29.220      3.275      8.921      0.000
+    R2MOTIVE          45.133      3.951     11.425      0.000
+    R2PRSIST           8.801      5.049      1.743      0.081
+    A3PPVT4W           0.910      0.100      9.094      0.000
+    A3WJAPW          204.341     32.525      6.283      0.000
+    A3CSR            240.341     27.613      8.704      0.000
+    KR3ATUDE          28.632      3.659      7.825      0.000
+    KR3MOTIV          62.487      6.463      9.669      0.000
+    KR3PRSST          20.134      5.070      3.971      0.000
+    COG2               0.186      0.093      1.995      0.046
+    COG3               0.260      0.074      3.500      0.000
+    ATL2               0.523      0.049     10.630      0.000
+    ATL3               0.771      0.055     14.077      0.000
+
+
+R-SQUARE
+
+    Observed                                        Two-Tailed
+    Variable        Estimate       S.E.  Est./S.E.    P-Value
+
+    A1PPVT4W           0.489      0.050      9.746      0.000
+    A1WJAPW            0.356      0.038      9.249      0.000
+    A1CSR              0.247      0.049      5.039      0.000
+    R1ATTUDE           0.664      0.030     22.268      0.000
+    R1MOTIVE           0.455      0.040     11.486      0.000
+    R1PRSIST           0.864      0.037     23.562      0.000
+    A2PPVT4W           0.569      0.040     14.391      0.000
+    A2WJAPW            0.656      0.043     15.195      0.000
+    A2CSR              0.226      0.037      6.064      0.000
+    R2ATTUDE           0.659      0.031     21.048      0.000
+    R2MOTIVE           0.528      0.038     13.789      0.000
+    R2PRSIST           0.902      0.057     15.932      0.000
+    A3PPVT4W           0.537      0.046     11.694      0.000
+    A3WJAPW            0.523      0.051     10.237      0.000
+    A3CSR              0.202      0.036      5.582      0.000
+    KR3ATUDE           0.720      0.028     25.717      0.000
+    KR3MOTIV           0.514      0.039     13.094      0.000
+    KR3PRSST           0.840      0.043     19.427      0.000
+
+     Latent                                         Two-Tailed
+    Variable        Estimate       S.E.  Est./S.E.    P-Value
+
+    COG2               0.814      0.093      8.733      0.000
+    COG3               0.740      0.074      9.954      0.000
+    ATL2               0.477      0.049      9.709      0.000
+    ATL3               0.229      0.055      4.185      0.000
+
+
+QUALITY OF NUMERICAL RESULTS
+
+     Condition Number for the Information Matrix              0.392E-07
+       (ratio of smallest to largest eigenvalue)
+
+
+MODEL MODIFICATION INDICES
+
+NOTE:  Modification indices for direct effects of observed dependent variables
+regressed on covariates may not be included.  To include these, request
+MODINDICES (ALL).
+
+Minimum M.I. value for printing the modification index    10.000
+
+                                   M.I.     E.P.C.  Std E.P.C.  StdYX E.P.C.
+
+BY Statements
+
+COG1     BY A1PPVT4W              12.125     0.113      0.113        0.071
+COG1     BY A1WJAPW               28.370    -5.487     -5.487       -0.202
+COG1     BY KR3ATUDE              12.457    -1.472     -1.472       -0.145
+COG2     BY A1PPVT4W              13.699     0.370      0.360        0.226
+COG2     BY A1WJAPW               23.542    -8.088     -7.874       -0.290
+COG2     BY KR3ATUDE              10.658    -1.364     -1.328       -0.131
+COG3     BY A1PPVT4W              11.137     0.349      0.322        0.202
+COG3     BY A1WJAPW               19.918    -7.918     -7.304       -0.269
+ATL1     BY R1MOTIVE              15.298    -0.943     -0.943       -0.095
+ATL2     BY A1CSR                 12.815     2.787      2.961        0.174
+ATL2     BY R1MOTIVE              15.166    -1.283     -1.363       -0.137
+ATL3     BY R1PRSIST              12.875     0.961      1.168        0.128
+
+ON/BY Statements
+
+ATL2     ON ATL3     /
+ATL3     BY ATL2                  10.632    -0.261     -0.298       -0.298
+ATL3     ON ATL1     /
+ATL1     BY ATL3                  10.129     0.342      0.281        0.281
+
+WITH Statements
+
+A1WJAPW  WITH A1PPVT4W            10.169    -5.826     -5.826       -0.235
+A1CSR    WITH A1PPVT4W            12.007     3.417      3.417        0.203
+ATL3     WITH ATL2                10.221    -0.290     -0.354       -0.354
+
+
+TECHNICAL 1 OUTPUT
+
+
+     PARAMETER SPECIFICATION
+
+
+           NU
+              A1PPVT4W      A1WJAPW       A1CSR         R1ATTUDE      R1MOTIVE
+              ________      ________      ________      ________      ________
+      1           1             2             3             4             5
+
+
+           NU
+              R1PRSIST      A2PPVT4W      A2WJAPW       A2CSR         R2ATTUDE
+              ________      ________      ________      ________      ________
+      1           6             7             8             9            10
+
+
+           NU
+              R2MOTIVE      R2PRSIST      A3PPVT4W      A3WJAPW       A3CSR
+              ________      ________      ________      ________      ________
+      1          11            12            13            14            15
+
+
+           NU
+              KR3ATUDE      KR3MOTIV      KR3PRSST
+              ________      ________      ________
+      1          16            17            18
+
+
+           LAMBDA
+              COG1          COG2          COG3          ATL1          ATL2
+              ________      ________      ________      ________      ________
+ A1PPVT4W          19             0             0             0             0
+ A1WJAPW           20             0             0             0             0
+ A1CSR             21             0             0             0             0
+ R1ATTUDE           0             0             0            22             0
+ R1MOTIVE           0             0             0            23             0
+ R1PRSIST           0             0             0            24             0
+ A2PPVT4W           0            19             0             0             0
+ A2WJAPW            0            20             0             0             0
+ A2CSR              0            21             0             0             0
+ R2ATTUDE           0             0             0             0            22
+ R2MOTIVE           0             0             0             0            23
+ R2PRSIST           0             0             0             0            24
+ A3PPVT4W           0             0            19             0             0
+ A3WJAPW            0             0            20             0             0
+ A3CSR              0             0            21             0             0
+ KR3ATUDE           0             0             0             0             0
+ KR3MOTIV           0             0             0             0             0
+ KR3PRSST           0             0             0             0             0
+
+
+           LAMBDA
+              ATL3
+              ________
+ A1PPVT4W           0
+ A1WJAPW            0
+ A1CSR              0
+ R1ATTUDE           0
+ R1MOTIVE           0
+ R1PRSIST           0
+ A2PPVT4W           0
+ A2WJAPW            0
+ A2CSR              0
+ R2ATTUDE           0
+ R2MOTIVE           0
+ R2PRSIST           0
+ A3PPVT4W           0
+ A3WJAPW            0
+ A3CSR              0
+ KR3ATUDE          22
+ KR3MOTIV          23
+ KR3PRSST          24
+
+
+           THETA
+              A1PPVT4W      A1WJAPW       A1CSR         R1ATTUDE      R1MOTIVE
+              ________      ________      ________      ________      ________
+ A1PPVT4W          25
+ A1WJAPW            0            26
+ A1CSR              0             0            27
+ R1ATTUDE           0             0             0            28
+ R1MOTIVE           0             0             0             0            29
+ R1PRSIST           0             0             0             0             0
+ A2PPVT4W          31             0             0             0             0
+ A2WJAPW            0            33             0             0             0
+ A2CSR              0             0            35             0             0
+ R2ATTUDE           0             0             0            37             0
+ R2MOTIVE           0             0             0             0            39
+ R2PRSIST           0             0             0             0             0
+ A3PPVT4W          43             0             0             0             0
+ A3WJAPW            0            46             0             0             0
+ A3CSR              0             0            49             0             0
+ KR3ATUDE           0             0             0            52             0
+ KR3MOTIV           0             0             0             0            55
+ KR3PRSST           0             0             0             0             0
+
+
+           THETA
+              R1PRSIST      A2PPVT4W      A2WJAPW       A2CSR         R2ATTUDE
+              ________      ________      ________      ________      ________
+ R1PRSIST          30
+ A2PPVT4W           0            32
+ A2WJAPW            0             0            34
+ A2CSR              0             0             0            36
+ R2ATTUDE           0             0             0             0            38
+ R2MOTIVE           0             0             0             0             0
+ R2PRSIST          41             0             0             0             0
+ A3PPVT4W           0            44             0             0             0
+ A3WJAPW            0             0            47             0             0
+ A3CSR              0             0             0            50             0
+ KR3ATUDE           0             0             0             0            53
+ KR3MOTIV           0             0             0             0             0
+ KR3PRSST          58             0             0             0             0
+
+
+           THETA
+              R2MOTIVE      R2PRSIST      A3PPVT4W      A3WJAPW       A3CSR
+              ________      ________      ________      ________      ________
+ R2MOTIVE          40
+ R2PRSIST           0            42
+ A3PPVT4W           0             0            45
+ A3WJAPW            0             0             0            48
+ A3CSR              0             0             0             0            51
+ KR3ATUDE           0             0             0             0             0
+ KR3MOTIV          56             0             0             0             0
+ KR3PRSST           0            59             0             0             0
+
+
+           THETA
+              KR3ATUDE      KR3MOTIV      KR3PRSST
+              ________      ________      ________
+ KR3ATUDE          54
+ KR3MOTIV           0            57
+ KR3PRSST           0             0            60
+
+
+           ALPHA
+              COG1          COG2          COG3          ATL1          ATL2
+              ________      ________      ________      ________      ________
+      1           0             0             0             0             0
+
+
+           ALPHA
+              ATL3
+              ________
+      1           0
+
+
+           BETA
+              COG1          COG2          COG3          ATL1          ATL2
+              ________      ________      ________      ________      ________
+ COG1               0             0             0             0             0
+ COG2              61             0             0            62             0
+ COG3               0            63             0             0            64
+ ATL1               0             0             0             0             0
+ ATL2              65             0             0            66             0
+ ATL3               0            67             0             0            68
+
+
+           BETA
+              ATL3
+              ________
+ COG1               0
+ COG2               0
+ COG3               0
+ ATL1               0
+ ATL2               0
+ ATL3               0
+
+
+           PSI
+              COG1          COG2          COG3          ATL1          ATL2
+              ________      ________      ________      ________      ________
+ COG1               0
+ COG2               0            69
+ COG3               0             0            70
+ ATL1              71             0             0             0
+ ATL2               0            72             0             0            73
+ ATL3               0             0            74             0             0
+
+
+           PSI
+              ATL3
+              ________
+ ATL3              75
+
+
+     STARTING VALUES
+
+
+           NU
+              A1PPVT4W      A1WJAPW       A1CSR         R1ATTUDE      R1MOTIVE
+              ________      ________      ________      ________      ________
+      1        10.847       382.158        63.208        51.947        52.577
+
+
+           NU
+              R1PRSIST      A2PPVT4W      A2WJAPW       A2CSR         R2ATTUDE
+              ________      ________      ________      ________      ________
+      1        52.315        11.850       399.680        62.124        52.435
+
+
+           NU
+              R2MOTIVE      R2PRSIST      A3PPVT4W      A3WJAPW       A3CSR
+              ________      ________      ________      ________      ________
+      1        52.908        52.741        13.538       426.923        65.926
+
+
+           NU
+              KR3ATUDE      KR3MOTIV      KR3PRSST
+              ________      ________      ________
+      1        50.896        50.350        49.622
+
+
+           LAMBDA
+              COG1          COG2          COG3          ATL1          ATL2
+              ________      ________      ________      ________      ________
+ A1PPVT4W       1.000         0.000         0.000         0.000         0.000
+ A1WJAPW        1.000         0.000         0.000         0.000         0.000
+ A1CSR          1.000         0.000         0.000         0.000         0.000
+ R1ATTUDE       0.000         0.000         0.000         1.000         0.000
+ R1MOTIVE       0.000         0.000         0.000         1.000         0.000
+ R1PRSIST       0.000         0.000         0.000         1.000         0.000
+ A2PPVT4W       0.000         1.100         0.000         0.000         0.000
+ A2WJAPW        0.000        16.534         0.000         0.000         0.000
+ A2CSR          0.000         7.216         0.000         0.000         0.000
+ R2ATTUDE       0.000         0.000         0.000         0.000         7.664
+ R2MOTIVE       0.000         0.000         0.000         0.000         7.011
+ R2PRSIST       0.000         0.000         0.000         0.000         8.809
+ A3PPVT4W       0.000         0.000         1.046         0.000         0.000
+ A3WJAPW        0.000         0.000        16.336         0.000         0.000
+ A3CSR          0.000         0.000         6.190         0.000         0.000
+ KR3ATUDE       0.000         0.000         0.000         0.000         0.000
+ KR3MOTIV       0.000         0.000         0.000         0.000         0.000
+ KR3PRSST       0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              ATL3
+              ________
+ A1PPVT4W       0.000
+ A1WJAPW        0.000
+ A1CSR          0.000
+ R1ATTUDE       0.000
+ R1MOTIVE       0.000
+ R1PRSIST       0.000
+ A2PPVT4W       0.000
+ A2WJAPW        0.000
+ A2CSR          0.000
+ R2ATTUDE       0.000
+ R2MOTIVE       0.000
+ R2PRSIST       0.000
+ A3PPVT4W       0.000
+ A3WJAPW        0.000
+ A3CSR          0.000
+ KR3ATUDE       8.299
+ KR3MOTIV       8.765
+ KR3PRSST      10.287
+
+
+           THETA
+              A1PPVT4W      A1WJAPW       A1CSR         R1ATTUDE      R1MOTIVE
+              ________      ________      ________      ________      ________
+ A1PPVT4W       1.332
+ A1WJAPW        0.000       306.053
+ A1CSR          0.000         0.000       150.226
+ R1ATTUDE       0.000         0.000         0.000        39.209
+ R1MOTIVE       0.000         0.000         0.000         0.000        42.930
+ R1PRSIST       0.000         0.000         0.000         0.000         0.000
+ A2PPVT4W       0.000         0.000         0.000         0.000         0.000
+ A2WJAPW        0.000         0.000         0.000         0.000         0.000
+ A2CSR          0.000         0.000         0.000         0.000         0.000
+ R2ATTUDE       0.000         0.000         0.000         0.000         0.000
+ R2MOTIVE       0.000         0.000         0.000         0.000         0.000
+ R2PRSIST       0.000         0.000         0.000         0.000         0.000
+ A3PPVT4W       0.000         0.000         0.000         0.000         0.000
+ A3WJAPW        0.000         0.000         0.000         0.000         0.000
+ A3CSR          0.000         0.000         0.000         0.000         0.000
+ KR3ATUDE       0.000         0.000         0.000         0.000         0.000
+ KR3MOTIV       0.000         0.000         0.000         0.000         0.000
+ KR3PRSST       0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              R1PRSIST      A2PPVT4W      A2WJAPW       A2CSR         R2ATTUDE
+              ________      ________      ________      ________      ________
+ R1PRSIST      42.473
+ A2PPVT4W       0.000         1.009
+ A2WJAPW        0.000         0.000       192.390
+ A2CSR          0.000         0.000         0.000       147.166
+ R2ATTUDE       0.000         0.000         0.000         0.000        42.749
+ R2MOTIVE       0.000         0.000         0.000         0.000         0.000
+ R2PRSIST       0.000         0.000         0.000         0.000         0.000
+ A3PPVT4W       0.000         0.000         0.000         0.000         0.000
+ A3WJAPW        0.000         0.000         0.000         0.000         0.000
+ A3CSR          0.000         0.000         0.000         0.000         0.000
+ KR3ATUDE       0.000         0.000         0.000         0.000         0.000
+ KR3MOTIV       0.000         0.000         0.000         0.000         0.000
+ KR3PRSST       0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              R2MOTIVE      R2PRSIST      A3PPVT4W      A3WJAPW       A3CSR
+              ________      ________      ________      ________      ________
+ R2MOTIVE      46.635
+ R2PRSIST       0.000        43.662
+ A3PPVT4W       0.000         0.000         0.955
+ A3WJAPW        0.000         0.000         0.000       229.375
+ A3CSR          0.000         0.000         0.000         0.000       146.195
+ KR3ATUDE       0.000         0.000         0.000         0.000         0.000
+ KR3MOTIV       0.000         0.000         0.000         0.000         0.000
+ KR3PRSST       0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              KR3ATUDE      KR3MOTIV      KR3PRSST
+              ________      ________      ________
+ KR3ATUDE      47.489
+ KR3MOTIV       0.000        67.704
+ KR3PRSST       0.000         0.000        62.138
+
+
+           ALPHA
+              COG1          COG2          COG3          ATL1          ATL2
+              ________      ________      ________      ________      ________
+      1         0.000         0.000         0.000         0.000         0.000
+
+
+           ALPHA
+              ATL3
+              ________
+      1         0.000
+
+
+           BETA
+              COG1          COG2          COG3          ATL1          ATL2
+              ________      ________      ________      ________      ________
+ COG1           0.000         0.000         0.000         0.000         0.000
+ COG2           0.000         0.000         0.000         0.000         0.000
+ COG3           0.000         0.000         0.000         0.000         0.000
+ ATL1           0.000         0.000         0.000         0.000         0.000
+ ATL2           0.000         0.000         0.000         0.000         0.000
+ ATL3           0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              ATL3
+              ________
+ COG1           0.000
+ COG2           0.000
+ COG3           0.000
+ ATL1           0.000
+ ATL2           0.000
+ ATL3           0.000
+
+
+           PSI
+              COG1          COG2          COG3          ATL1          ATL2
+              ________      ________      ________      ________      ________
+ COG1           1.000
+ COG2           0.000         0.050
+ COG3           0.000         0.000         0.050
+ ATL1           0.000         0.000         0.000         1.000
+ ATL2           0.000         0.000         0.000         0.000         0.050
+ ATL3           0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              ATL3
+              ________
+ ATL3           0.050
+
+
+DIAGRAM INFORMATION
+
+  Use View Diagram under the Diagram menu in the Mplus Editor to view the diagram.
+  If running Mplus from the Mplus Diagrammer, the diagram opens automatically.
+
+  Diagram output
+    c:\users\bfoste01\dropbox\scripts on the go\scripts\10-22-14\1.cross-lag.dgm
+
+     Beginning Time:  09:44:54
+        Ending Time:  09:44:55
+       Elapsed Time:  00:00:01
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2014 Muthen & Muthen
