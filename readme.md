@@ -26,4 +26,3 @@ To explore the accuracy of these estimates two additional steps were taken:
 
 1. The models were estimated without weights to see if the parameter estimates were comparable. 
 2. The models were estimated with Bayes estimation techniques in order to see the 95% probability that the estimate fell within a range of estimates, and that this was comparable to the other 2 models.
-- 
