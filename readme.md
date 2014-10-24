@@ -3,7 +3,6 @@
 - The following models examines a longitudinal moderation cross-lagged latent panel model. 
 - Data are drawn from a large national sample.
 	- The specific dataset will not be listed here until the paper is under agreement for publication.  
-## MPlus Scripts
 
 ## File Organization
 
