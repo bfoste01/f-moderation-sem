@@ -4,7 +4,7 @@
 - Data are drawn from a large national sample.
 	- The specific dataset will not be listed here until the paper is under agreement for publication.  
 
-# File Manifest
+## File Manifest
 
 - The folder titled 'invariance' contains longitudinal tests to establish factorial invariance. 
 - The folder titled weighted contains the longitudinal cross lage
