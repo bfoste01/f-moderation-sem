@@ -3,12 +3,7 @@
 - The following models examines a longitudinal moderation cross-lagged latent panel model. 
 - Data are drawn from a large national sample.
 	- The specific dataset will not be listed here until the paper is under agreement for publication.  
-
-## File Manifest
-
-- The folder titled 'invariance' contains longitudinal tests to establish factorial invariance. 
-- The folder titled weighted contains the longitudinal cross lage
-
+	- 
 ## MPlus Scripts
 
 - All the files for invariance testing are located in the 'invariance' subfolder
