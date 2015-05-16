@@ -1,0 +1,186 @@
+VERSION 1.1.0
+INPUT
+TITLE:
+
+    Cross-lag model, no controls, no problem BeH
+DATA:
+ FILE = "moderation.4.dat";
+VARIABLE:
+  NAMES = A1PPVT4W A1WJAPW A1WJLWW A1CSR A1ECMIRT A1WJSW R1ATTUDE R1MOTIVE R1PRSIST
+       A2PPVT4W A2WJAPW A2WJLWW A2CSR A2ECMIRT A2WJSW R2ATTUDE R2MOTIVE R2PRSIST
+       A3PPVT4W A3WJAPW A3WJLWW A3CSR A3ECMIRT A3WJSW KR3ATUDE KR3MOTIV KR3PRSST
+       R1TPLBS R2TPLBS KR3TPLBS STRAT PSU PRA12OTW CHGENDER P1RMOMED A1CAGE A2CAGE
+       A3CAGE CRACE P1PRGTYP P2PRGTYP P3PRGTYP O2CLSSCD O2CLSSIS O2CLSSLM O2CLSSQF
+       CLS1_ID CLS2_ID CLS3_ID R1BAGGR R1BWITH R1BHYPER R1ATTUDE_1 R2BAGGR R2BWITH
+       R2BHYPER KR3BAGGR KR3BHYPE KR3BWITH BINAGGR1 BINWITH1 BINHYP1 BINAGGR2 BINWITH2
+       BINHYP2 BINAGGR3 BINWITH3 BINHYP3;
+  USEVARIABLES = A1PPVT4W A1WJAPW A1CSR
+       R1ATTUDE R1MOTIVE R1PRSIST
+       A2PPVT4W A2WJAPW A2CSR
+       R2ATTUDE R2MOTIVE R2PRSIST
+       A3PPVT4W A3WJAPW A3CSR
+       KR3ATUDE KR3MOTIV KR3PRSST;
+  MISSING=.;
+DEFINE:
+ A1PPVT4W = A1PPVT4W/10;
+          A1WJLWW = A1WJLWW/10;
+          A2PPVT4W = A2PPVT4W/10;
+          A2WJLWW = A2WJLWW/10;
+          A3PPVT4W = A3PPVT4W/10;
+          A3WJLWW = A3WJLWW/10;
+          A1WJAPW = A1WJAPW/10;
+          A2WJAPW = A2WJAPW/10;
+          A3WJAPW = A3WJAPW/10;
+ANALYSIS:
+    ITERATIONS = 10000;
+    ESTIMATOR = BAYES;
+    PROCESSORS = 5;
+OUTPUT:
+      TECH1 TECH4
+      SAMPSTAT
+      modindices;
+      STANDARDIZED;
+MODEL:
+    cog1 BY A1WJAPW*
+    A1PPVT4W(2)
+    A1CSR(3);
+    cog2 BY A2WJAPW*(1)
+    A2PPVT4W(2)
+    A2CSR(3);
+    cog3 BY A3WJAPW*(1)
+    A3PPVT4W(2)
+    A3CSR(3);
+    cog1@1.0;
+    atl1 BY R1ATTUDE*(4)
+    R1MOTIVE(5)
+    R1PRSIST(6);
+    atl2 BY R2ATTUDE*(4)
+    R2MOTIVE(5)
+    R2PRSIST(6);
+    atl3 BY KR3ATUDE*(4)
+    KR3MOTIV(5)
+    KR3PRSST(6);
+    atl1@1.0;
+    A1WJAPW WITH A2WJAPW A3WJAPW;
+    A2WJAPW WITH A3WJAPW;
+    A1PPVT4W WITH A2PPVT4W A3PPVT4W;
+    A2PPVT4W WITH A3PPVT4W;
+    A1CSR WITH A2CSR A3CSR;
+    A2CSR WITH A3CSR;
+    R1ATTUDE WITH R2ATTUDE KR3ATUDE;
+    R2ATTUDE WITH KR3ATUDE;
+    R1MOTIVE WITH R2MOTIVE KR3MOTIV;
+    R2MOTIVE WITH KR3MOTIV;
+    R1PRSIST WITH R2PRSIST KR3PRSST;
+    R2PRSIST WITH KR3PRSST;
+    atl1 WITH cog1;
+    atl2 WITH cog2;
+    atl3 WITH cog3;
+    cog2 ON cog1;
+    atl2 ON cog1;
+    atl2 ON atl1;
+    cog2 ON atl1;
+    cog3 ON cog2;
+    cog3 ON atl2;
+    atl3 ON cog2;
+    atl3 ON atl2;
+INPUT_END
+1
+1
+1
+1
+BAYES
+1
+GENERAL
+0
+18
+6
+0
+a1ppvt4w a1wjapw a1csr r1attude r1motive r1prsist a2ppvt4w a2wjapw a2csr r2attude r2motive r2prsist a3ppvt4w a3wjapw a3csr kr3atude kr3motiv kr3prsst cog1 cog2 cog3 atl1 atl2 atl3
+3
+-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 1 2 0 1 2
+0
+6
+cog1
+a1wjapw a1ppvt4w a1csr
+cog2
+a2wjapw a2ppvt4w a2csr
+cog3
+a3wjapw a3ppvt4w a3csr
+atl1
+r1attude r1motive r1prsist
+atl2
+r2attude r2motive r2prsist
+atl3
+kr3atude kr3motiv kr3prsst
+1 1 cog1 a1wjapw     0.452
+1 1 cog1 a1ppvt4w     0.554
+1 1 cog1 a1csr     5.614
+1 1 cog2 a2wjapw     0.944
+1 1 cog2 a2ppvt4w     0.554
+1 1 cog2 a2csr     5.614
+1 1 cog3 a3wjapw     0.944
+1 1 cog3 a3ppvt4w     0.554
+1 1 cog3 a3csr     5.614
+1 1 atl1 r1attude     6.914
+1 1 atl1 r1motive     6.620
+1 1 atl1 r1prsist     8.566
+1 1 atl2 r2attude     6.914
+1 1 atl2 r2motive     6.620
+1 1 atl2 r2prsist     8.566
+1 1 atl3 kr3atude     6.914
+1 1 atl3 kr3motiv     6.620
+1 1 atl3 kr3prsst     8.566
+1 1 cog1 cog2  8890.151
+1 1 atl1 cog2 -8889.142
+1 1 cog1 atl2 14375.244
+1 1 atl1 atl2 *********
+1 1 cog2 cog3     0.748
+1 1 atl2 cog3     0.091
+1 1 cog2 atl3     0.320
+1 1 atl2 atl3     0.319
+2 1 a1wjapw a2wjapw     1.216
+2 1 a1wjapw a3wjapw     1.050
+2 1 a2wjapw a3wjapw     1.253
+2 1 a1ppvt4w a2ppvt4w     1.250
+2 1 a1ppvt4w a3ppvt4w     0.826
+2 1 a2ppvt4w a3ppvt4w     0.728
+2 1 a1csr a2csr    55.783
+2 1 a1csr a3csr    41.990
+2 1 a2csr a3csr    29.080
+2 1 r1attude r2attude    14.782
+2 1 r1attude kr3atude     1.783
+2 1 r2attude kr3atude     2.594
+2 1 r1motive r2motive    25.953
+2 1 r1motive kr3motiv    12.930
+2 1 r2motive kr3motiv    14.372
+2 1 r1prsist r2prsist    -0.064
+2 1 r1prsist kr3prsst    -1.985
+2 1 r2prsist kr3prsst     1.813
+2 1 atl1 cog1     0.990
+2 1 atl2 cog2     0.127
+2 1 atl3 cog3     0.156
+4 1 a1ppvt4w     2.490
+4 1 a1wjapw     6.147
+4 1 a1csr   280.630
+4 1 r1attude    28.671
+4 1 r1motive    53.744
+4 1 r1prsist     9.125
+4 1 a2ppvt4w     1.394
+4 1 a2wjapw     2.084
+4 1 a2csr   220.547
+4 1 r2attude    39.082
+4 1 r2motive    49.332
+4 1 r2prsist     3.085
+4 1 a3ppvt4w     1.080
+4 1 a3wjapw     2.734
+4 1 a3csr   223.102
+4 1 kr3atude    32.553
+4 1 kr3motiv    58.059
+4 1 kr3prsst    23.916
+4 1 cog2     1.258
+4 1 cog3     0.880
+4 1 atl2     0.719
+4 1 atl3     1.013
+5 1 cog1     1.000
+5 1 atl1     1.000

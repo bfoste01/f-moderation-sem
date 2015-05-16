@@ -1,0 +1,312 @@
+VERSION 1.1.0
+INPUT
+TITLE:
+
+    Full moderated model
+DATA:
+ FILE = "moderation.4.dat";
+VARIABLE:
+  NAMES = A1PPVT4W A1WJAPW A1WJLWW A1CSR A1ECMIRT A1WJSW R1ATTUDE R1MOTIVE R1PRSIST
+       A2PPVT4W A2WJAPW A2WJLWW A2CSR A2ECMIRT A2WJSW R2ATTUDE R2MOTIVE R2PRSIST
+       A3PPVT4W A3WJAPW A3WJLWW A3CSR A3ECMIRT A3WJSW KR3ATUDE KR3MOTIV KR3PRSST
+       R1TPLBS R2TPLBS KR3TPLBS STRAT PSU PRA12OTW CHGENDER P1RMOMED A1CAGE A2CAGE
+       A3CAGE CRACE P1PRGTYP P2PRGTYP P3PRGTYP O2CLSSCD O2CLSSIS O2CLSSLM O2CLSSQF
+       CLS1_ID CLS2_ID CLS3_ID R1BAGGR R1BWITH R1BHYPER R1ATTUDE_1 R2BAGGR R2BWITH
+       R2BHYPER KR3BAGGR KR3BHYPE KR3BWITH BINAGGR1 BINWITH1 BINHYP1 BINAGGR2 BINWITH2
+       BINHYP2 BINAGGR3 BINWITH3 BINHYP3;
+  USEVARIABLES = A1PPVT4W A1WJAPW A1CSR
+       R1ATTUDE R1MOTIVE R1PRSIST
+       A2PPVT4W A2WJAPW A2CSR
+       R2ATTUDE R2MOTIVE R2PRSIST
+       BINAGGR2 BINWITH2 BINHYP2
+       A3PPVT4W A3WJAPW A3CSR
+       KR3ATUDE KR3MOTIV KR3PRSST
+       STRAT PSU PRA12OTW CHGENDER A1CAGE A2CAGE
+       ED1 ED2 ED3  PTYPE1 PTYPE2 PTYPE3;
+  STRATIFICATION = STRAT;
+  CLUSTER = PSU;
+  WEIGHT = PRA12OTW;
+  CATEGORICAL= BINAGGR2 BINWITH2 BINHYP2;
+  MISSING=.;
+DEFINE:
+ A1PPVT4W = A1PPVT4W/10;
+          A1WJLWW = A1WJLWW/10;
+          A2PPVT4W = A2PPVT4W/10;
+          A2WJLWW = A2WJLWW/10;
+          A3PPVT4W = A3PPVT4W/10;
+          A3WJLWW = A3WJLWW/10;
+          A1WJAPW = A1WJAPW/10;
+          A2WJAPW = A2WJAPW/10;
+          A3WJAPW = A3WJAPW/10;
+          ED1 = 0;
+          if (P1RMOMED == 1) then ED1 = 1;
+          ED2 = 0;
+          if (P1RMOMED == 2) then ED2 = 1;
+          ED3 = 0;
+          if (P1RMOMED == 3) then ED3 = 1;
+          ED4 = 0;
+          if (P1RMOMED == 4) then ED4 = 1;
+          PTYPE1 = 0;
+          if (P1PRGTYP ==1) then PTYPE1 = 0;
+          if (P1PRGTYP ==2) then PTYPE1 = 1;
+          PTYPE2 = 0;
+          if (P2PRGTYP ==1) then PTYPE2 = 0;
+          if (P2PRGTYP ==2) then PTYPE2 = 1;
+          PTYPE3 = 0;
+          if (P3PRGTYP ==4) then PTYPE3 = 0;
+          if (P3PRGTYP ==5) then PTYPE3 = 1;
+ANALYSIS:
+    TYPE = COMPLEX RANDOM;
+    ITERATIONS = 10000;
+    ESTIMATOR = MLR;
+    PROCESSORS = 5;
+OUTPUT:
+      TECH1 TECH4
+      SAMPSTAT
+      modindices;
+      STANDARDIZED;
+MODEL:
+    cog1 BY A1WJAPW*
+    A1PPVT4W(2)
+    A1CSR(3);
+    cog2 BY A2WJAPW*(1)
+    A2PPVT4W(2)
+    A2CSR(3);
+    cog3 BY A3WJAPW*(1)
+    A3PPVT4W(2)
+    A3CSR(3);
+    cog1@1.0;
+    atl1 BY R1ATTUDE*(4)
+    R1MOTIVE(5)
+    R1PRSIST(6);
+    atl2 BY R2ATTUDE*(4)
+    R2MOTIVE(5)
+    R2PRSIST(6);
+    atl3 BY KR3ATUDE*(4)
+    KR3MOTIV(5)
+    KR3PRSST(6);
+    atl1@1.0;
+    A1WJAPW WITH A2WJAPW A3WJAPW;
+    A2WJAPW WITH A3WJAPW;
+    A1PPVT4W WITH A2PPVT4W A3PPVT4W;
+    A2PPVT4W WITH A3PPVT4W;
+    A1CSR WITH A2CSR A3CSR;
+    A2CSR WITH A3CSR;
+    R1ATTUDE WITH R2ATTUDE KR3ATUDE;
+    R2ATTUDE WITH KR3ATUDE;
+    R1MOTIVE WITH R2MOTIVE KR3MOTIV;
+    R2MOTIVE WITH KR3MOTIV;
+    R1PRSIST WITH R2PRSIST KR3PRSST;
+    R2PRSIST WITH KR3PRSST;
+    atl1 WITH cog1;
+    atl2 WITH cog2;
+    atl3 WITH cog3;
+    cog2 WITH prob2;
+    cog2 ON cog1;
+    atl2 ON cog1;
+    atl2 ON atl1;
+    cog2 ON atl1;
+    cog3 ON cog2;
+    cog3 ON atl2;
+    atl3 ON cog2;
+    atl3 ON atl2;
+    prob2 BY BINAGGR2* BINWITH2 BINHYP2;
+    prob2@1.0;
+    mod2a | atl2 XWITH prob2;
+    prob2 WITH cog2;
+    mod2b | atl2 XWITH cog2;
+    atl3 ON mod2a;
+    cog3 ON mod2a;
+    atl3 ON mod2b;
+    cog3 ON mod2b;
+    cog3 ON prob2;
+    atl3 ON prob2;
+    cog1 ON CHGENDER;
+    cog1 ON ED1;
+    cog1 ON ED2;
+    cog1 ON ED3;
+    cog3 ON PTYPE3;
+    atl1 ON PTYPE1;
+    cog1 ON PTYPE1;
+    atl3 ON PTYPE3;
+    atl1 ON CHGENDER;
+    atl1 ON ED1;
+    atl1 ON ED2;
+    atl1 ON ED3;
+    cog1 ON A1CAGE;
+    atl1 ON A1CAGE;
+    prob2 ON CHGENDER;
+    prob2 ON ED1;
+    prob2 ON ED2;
+    prob2 ON ED3;
+    prob2 ON A2CAGE;
+    prob2 ON PTYPE2;
+INPUT_END
+2
+0
+0
+0
+MLR
+1
+GENERAL
+0
+21
+9
+9
+binaggr2 binwith2 binhyp2 a1ppvt4w a1wjapw a1csr r1attude r1motive r1prsist a2ppvt4w a2wjapw a2csr r2attude r2motive r2prsist a3ppvt4w a3wjapw a3csr kr3atude kr3motiv kr3prsst cog1 cog2 cog3 atl1 atl2 atl3 prob2 mod2a mod2b chgender a1cage a2cage ed1 ed2 ed3 ptype1 ptype2 ptype3
+4
+-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 1 2 3 1 2 3 1 0 0 0 0 0 0 0 0 0 0 0
+0
+7
+cog1
+a1wjapw a1ppvt4w a1csr
+cog2
+a2wjapw a2ppvt4w a2csr
+cog3
+a3wjapw a3ppvt4w a3csr
+atl1
+r1attude r1motive r1prsist
+atl2
+r2attude r2motive r2prsist
+atl3
+kr3atude kr3motiv kr3prsst
+prob2
+binaggr2 binwith2 binhyp2
+1 1 cog1 a1wjapw    0.945    0.177
+1 1 cog1 a1ppvt4w    1.178    0.080
+1 1 cog1 a1csr    8.172    0.875
+1 1 cog2 a2wjapw    1.875    0.142
+1 1 cog2 a2ppvt4w    1.178    0.080
+1 1 cog2 a2csr    8.172    0.875
+1 1 cog3 a3wjapw    1.875    0.142
+1 1 cog3 a3ppvt4w    1.178    0.080
+1 1 cog3 a3csr    8.172    0.875
+1 1 atl1 r1attude    6.560    0.279
+1 1 atl1 r1motive    6.161    0.293
+1 1 atl1 r1prsist    7.893    0.444
+1 1 atl2 r2attude    6.560    0.279
+1 1 atl2 r2motive    6.161    0.293
+1 1 atl2 r2prsist    7.893    0.444
+1 1 atl3 kr3atude    6.560    0.279
+1 1 atl3 kr3motiv    6.161    0.293
+1 1 atl3 kr3prsst    7.893    0.444
+1 1 prob2 binaggr2    2.714    0.740
+1 1 prob2 binwith2    0.804    0.218
+1 1 prob2 binhyp2    2.491    0.587
+1 1 ptype3 cog3   -0.173    0.088
+1 1 ptype3 atl3   -0.180    0.162
+1 1 chgender cog1   -0.350    0.119
+1 1 ed1 cog1   -0.600    0.177
+1 1 ed2 cog1   -0.296    0.161
+1 1 ed3 cog1    0.037    0.167
+1 1 ptype1 cog1    0.168    0.134
+1 1 a1cage cog1    0.078    0.015
+1 1 ptype1 atl1    0.282    0.113
+1 1 chgender atl1   -0.674    0.118
+1 1 ed1 atl1    0.125    0.145
+1 1 ed2 atl1   -0.011    0.164
+1 1 ed3 atl1    0.333    0.138
+1 1 a1cage atl1    0.023    0.011
+1 1 chgender prob2    0.704    0.152
+1 1 ed1 prob2   -0.447    0.170
+1 1 ed2 prob2   -0.363    0.191
+1 1 ed3 prob2   -0.256    0.156
+1 1 a2cage prob2   -0.010    0.016
+1 1 ptype2 prob2   -0.251    0.223
+1 1 cog1 cog2    0.724    0.076
+1 1 atl1 cog2    0.022    0.059
+1 1 cog1 atl2    0.070    0.056
+1 1 atl1 atl2    0.713    0.059
+1 1 cog2 cog3    0.815    0.058
+1 1 atl2 cog3    0.116    0.128
+1 1 mod2a cog3    0.087    0.069
+1 1 mod2b cog3   -0.007    0.031
+1 1 prob2 cog3   -0.065    0.143
+1 1 cog2 atl3    0.491    0.137
+1 1 atl2 atl3    0.397    0.290
+1 1 mod2a atl3    0.073    0.174
+1 1 mod2b atl3   -0.081    0.087
+1 1 prob2 atl3   -0.444    0.390
+2 1 a1wjapw a2wjapw    0.471    0.185
+2 1 a1wjapw a3wjapw    0.136    0.274
+2 1 a2wjapw a3wjapw    0.311    0.193
+2 1 a1ppvt4w a2ppvt4w    0.373    0.081
+2 1 a1ppvt4w a3ppvt4w    0.283    0.079
+2 1 a2ppvt4w a3ppvt4w    0.444    0.056
+2 1 a1csr a2csr   54.183   14.259
+2 1 a1csr a3csr   36.296   18.331
+2 1 a2csr a3csr   56.388   16.670
+2 1 r1attude r2attude   11.090    2.194
+2 1 r1attude kr3atude    6.510    2.106
+2 1 r2attude kr3atude    5.338    2.527
+2 1 r1motive r2motive   25.873    3.956
+2 1 r1motive kr3motiv   17.808    4.540
+2 1 r2motive kr3motiv   17.911    3.711
+2 1 r1prsist r2prsist    3.398    3.611
+2 1 r1prsist kr3prsst   -2.395    2.727
+2 1 r2prsist kr3prsst   -2.417    2.667
+2 1 atl1 cog1    0.372    0.055
+2 1 atl2 cog2    0.010    0.038
+2 1 atl3 cog3    0.054    0.057
+2 1 cog2 prob2   -0.024    0.075
+4 1 a1ppvt4w    1.034    0.142
+4 1 a1wjapw    5.160    0.422
+4 1 a1csr  220.287   15.316
+4 1 r1attude   25.351    2.294
+4 1 r1motive   53.628    5.541
+4 1 r1prsist   11.720    3.074
+4 1 a2ppvt4w    0.869    0.065
+4 1 a2wjapw    1.208    0.166
+4 1 a2csr  238.767   16.935
+4 1 r2attude   29.437    3.227
+4 1 r2motive   45.809    3.623
+4 1 r2prsist    8.399    5.619
+4 1 a3ppvt4w    0.939    0.096
+4 1 a3wjapw    1.809    0.368
+4 1 a3csr  246.659   27.382
+4 1 kr3atude   28.594    4.067
+4 1 kr3motiv   63.231    6.692
+4 1 kr3prsst   19.892    5.342
+4 1 cog1    1.000    0.000
+4 1 cog2    0.171    0.062
+4 1 cog3    0.161    0.059
+4 1 atl1    1.000    0.000
+4 1 atl2    0.690    0.087
+4 1 atl3    1.234    0.191
+4 1 prob2    1.000    0.000
+2 1 chgender a1cage  999.000  999.000
+2 1 chgender a2cage  999.000  999.000
+2 1 chgender ed1  999.000  999.000
+2 1 chgender ed2  999.000  999.000
+2 1 chgender ed3  999.000  999.000
+2 1 chgender ptype1  999.000  999.000
+2 1 chgender ptype2  999.000  999.000
+2 1 chgender ptype3  999.000  999.000
+2 1 a1cage a2cage  999.000  999.000
+2 1 a1cage ed1  999.000  999.000
+2 1 a1cage ed2  999.000  999.000
+2 1 a1cage ed3  999.000  999.000
+2 1 a1cage ptype1  999.000  999.000
+2 1 a1cage ptype2  999.000  999.000
+2 1 a1cage ptype3  999.000  999.000
+2 1 a2cage ed1  999.000  999.000
+2 1 a2cage ed2  999.000  999.000
+2 1 a2cage ed3  999.000  999.000
+2 1 a2cage ptype1  999.000  999.000
+2 1 a2cage ptype2  999.000  999.000
+2 1 a2cage ptype3  999.000  999.000
+2 1 ed1 ed2  999.000  999.000
+2 1 ed1 ed3  999.000  999.000
+2 1 ed1 ptype1  999.000  999.000
+2 1 ed1 ptype2  999.000  999.000
+2 1 ed1 ptype3  999.000  999.000
+2 1 ed2 ed3  999.000  999.000
+2 1 ed2 ptype1  999.000  999.000
+2 1 ed2 ptype2  999.000  999.000
+2 1 ed2 ptype3  999.000  999.000
+2 1 ed3 ptype1  999.000  999.000
+2 1 ed3 ptype2  999.000  999.000
+2 1 ed3 ptype3  999.000  999.000
+2 1 ptype1 ptype2  999.000  999.000
+2 1 ptype1 ptype3  999.000  999.000
+2 1 ptype2 ptype3  999.000  999.000

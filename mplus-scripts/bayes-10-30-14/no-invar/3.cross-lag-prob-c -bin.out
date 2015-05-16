@@ -1,0 +1,1818 @@
+Mplus VERSION 7.3
+MUTHEN & MUTHEN
+10/30/2014  11:05 AM
+
+INPUT INSTRUCTIONS
+
+    TITLE:
+      Cross-lagged w/prob no weights
+    DATA: FILE = "moderation.4.dat";
+    DEFINE: A1PPVT4W = A1PPVT4W/10;
+            A1WJLWW = A1WJLWW/10;
+            A2PPVT4W = A2PPVT4W/10;
+            A2WJLWW = A2WJLWW/10;
+            A3PPVT4W = A3PPVT4W/10;
+            A3WJLWW = A3WJLWW/10;
+             A1WJAPW = A1WJAPW/10;
+            A2WJAPW = A2WJAPW/10;
+            A3WJAPW = A3WJAPW/10;
+            ED1 = 0;
+            if (P1RMOMED == 1) then ED1 = 1;
+            ED2 = 0;
+            if (P1RMOMED == 2) then ED2 = 1;
+            ED3 = 0;
+            if (P1RMOMED == 3) then ED3 = 1;
+            ED4 = 0;
+            if (P1RMOMED == 4) then ED4 = 1;
+            PTYPE1 = 0;
+            if (P1PRGTYP ==1) then PTYPE1 = 0;
+            if (P1PRGTYP ==2) then PTYPE1 = 1;
+            PTYPE2 = 0;
+            if (P2PRGTYP ==1) then PTYPE2 = 0;
+            if (P2PRGTYP ==2) then PTYPE2 = 1;
+            PTYPE3 = 0;
+            if (P3PRGTYP ==4) then PTYPE3 = 0;
+            if (P3PRGTYP ==5) then PTYPE3 = 1;
+    VARIABLE:
+    NAMES = A1PPVT4W A1WJAPW A1WJLWW A1CSR A1ECMIRT A1WJSW R1ATTUDE R1MOTIVE R1PRSIST
+         A2PPVT4W A2WJAPW A2WJLWW A2CSR A2ECMIRT A2WJSW R2ATTUDE R2MOTIVE R2PRSIST
+         A3PPVT4W A3WJAPW A3WJLWW A3CSR A3ECMIRT A3WJSW KR3ATUDE KR3MOTIV KR3PRSST
+         R1TPLBS R2TPLBS KR3TPLBS STRAT PSU PRA12OTW CHGENDER P1RMOMED A1CAGE A2CAGE
+         A3CAGE CRACE P1PRGTYP P2PRGTYP P3PRGTYP O2CLSSCD O2CLSSIS O2CLSSLM O2CLSSQF
+         CLS1_ID CLS2_ID CLS3_ID R1BAGGR R1BWITH R1BHYPER R1ATTUDE_1 R2BAGGR R2BWITH
+         R2BHYPER KR3BAGGR KR3BHYPE KR3BWITH BINAGGR1 BINWITH1 BINHYP1 BINAGGR2 BINWITH2
+         BINHYP2 BINAGGR3 BINWITH3 BINHYP3;
+    USEVARIABLES = A1PPVT4W A1WJAPW A1CSR
+         R1ATTUDE R1MOTIVE R1PRSIST
+         A2PPVT4W A2WJAPW A2CSR
+         R2ATTUDE R2MOTIVE R2PRSIST
+         BINAGGR2 BINWITH2 BINHYP2
+         A3PPVT4W A3WJAPW A3CSR
+         KR3ATUDE KR3MOTIV KR3PRSST
+         CHGENDER A1CAGE A2CAGE
+         ED1 ED2 ED3  PTYPE1 PTYPE2 PTYPE3;
+    CATEGORICAL= BINAGGR2 BINWITH2 BINHYP2;
+    MISSING=.;
+    ANALYSIS:
+      ITERATIONS = 10000;
+      ESTIMATOR = BAYES;
+      ALGORITHM=GIBBS(RW);
+      PROCESSORS = 5;
+    MODEL:
+      cog1 BY A1WJAPW*(1)
+      A1PPVT4W(2)
+      A1CSR(3);
+      cog2 BY A2WJAPW*(1)
+      A2PPVT4W(2)
+      A2CSR(3);
+      cog3 BY A3WJAPW*(1)
+      A3PPVT4W(2)
+      A3CSR(3);
+      cog1@1.0;
+
+      atl1 BY R1ATTUDE*(4)
+      R1MOTIVE(5)
+      R1PRSIST(6);
+      atl2 BY R2ATTUDE*(4)
+      R2MOTIVE(5)
+      R2PRSIST(6);
+      atl3 BY KR3ATUDE*(4)
+      KR3MOTIV(5)
+      KR3PRSST(6);
+      atl1@1.0;
+
+      !allow some correlated residuals
+      !auto-correlations
+      A1WJAPW WITH A2WJAPW A3WJAPW;
+      A2WJAPW WITH A3WJAPW;
+      A1PPVT4W WITH A2PPVT4W A3PPVT4W;
+      A2PPVT4W WITH A3PPVT4W;
+      A1CSR WITH A2CSR A3CSR;
+      A2CSR WITH A3CSR;
+      R1ATTUDE WITH R2ATTUDE KR3ATUDE;
+      R2ATTUDE WITH KR3ATUDE;
+      R1MOTIVE WITH R2MOTIVE KR3MOTIV;
+      R2MOTIVE WITH KR3MOTIV;
+      R1PRSIST WITH R2PRSIST KR3PRSST;
+      R2PRSIST WITH KR3PRSST;
+
+     !allowing only concurrent non-directional paths
+      atl1 WITH cog1;
+      atl2 WITH cog2;
+      atl3 WITH cog3;
+      cog2 WITH prob2;
+      !atl2 WITH prob2;
+
+     !cross-lagged paths
+      cog2 ON cog1;
+      atl2 ON cog1;
+      atl2 ON atl1;
+      cog2 ON atl1;
+      cog3 ON cog2;
+      cog3 ON atl2;
+      atl3 ON cog2;
+      atl3 ON atl2;
+
+      !for moderation variable
+      ! note this is a zero inflated varaible
+      prob2 BY BINAGGR2* BINWITH2 BINHYP2;
+      prob2@1.0;
+
+      !added these paths
+      cog3 ON prob2;
+      atl3 ON prob2;
+
+      !covariates at T1 only down stream effects free of cov influence
+      !prob added at T2
+
+      cog1 ON CHGENDER;
+      cog1 ON ED1;
+      cog1 ON ED2;
+      cog1 ON ED3;
+      cog3 ON PTYPE3;
+      atl1 ON PTYPE1;
+      cog1 ON PTYPE1;
+      atl3 ON PTYPE3;
+      atl1 ON CHGENDER;
+      atl1 ON ED1;
+      atl1 ON ED2;
+      atl1 ON ED3;
+      cog1 ON A1CAGE;
+      atl1 ON A1CAGE;
+      !added
+      prob2 ON CHGENDER;
+      prob2 ON ED1;
+      prob2 ON ED2;
+      prob2 ON ED3;
+      prob2 ON A2CAGE;
+      prob2 ON PTYPE2;
+
+      OUTPUT:
+        TECH1 TECH4
+        SAMPSTAT
+        modindices;
+        STANDARDIZED;
+
+
+
+
+*** WARNING in ANALYSIS command
+  For ESTIMATOR=BAYES, the actual number of PROCESSORS used is equal to the number
+  of MCMC chains.  One processor will be used for each MCMC chain.
+*** WARNING in OUTPUT command
+  SAMPSTAT option is not available for ESTIMATOR=BAYES.  Use TYPE=BASIC.
+  Request for SAMPSTAT is ignored.
+*** WARNING in OUTPUT command
+  MODINDICES option is not available for ESTIMATOR=BAYES.
+  Request for MODINDICES is ignored.
+*** WARNING
+  Data set contains cases with missing on x-variables.
+  These cases were not included in the analysis.
+  Number of cases with missing on x-variables:  21
+   4 WARNING(S) FOUND IN THE INPUT INSTRUCTIONS
+
+
+
+
+Cross-lagged w/prob no weights
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                         600
+
+Number of dependent variables                                   21
+Number of independent variables                                  9
+Number of continuous latent variables                            7
+
+Observed dependent variables
+
+  Continuous
+   A1PPVT4W    A1WJAPW     A1CSR       R1ATTUDE    R1MOTIVE    R1PRSIST
+   A2PPVT4W    A2WJAPW     A2CSR       R2ATTUDE    R2MOTIVE    R2PRSIST
+   A3PPVT4W    A3WJAPW     A3CSR       KR3ATUDE    KR3MOTIV    KR3PRSST
+
+  Binary and ordered categorical (ordinal)
+   BINAGGR2    BINWITH2    BINHYP2
+
+Observed independent variables
+   CHGENDER    A1CAGE      A2CAGE      ED1         ED2         ED3
+   PTYPE1      PTYPE2      PTYPE3
+
+Continuous latent variables
+   COG1        COG2        COG3        ATL1        ATL2        ATL3
+   PROB2
+
+
+Estimator                                                    BAYES
+Specifications for Bayesian Estimation
+  Point estimate                                            MEDIAN
+  Number of Markov chain Monte Carlo (MCMC) chains               2
+  Random seed for the first chain                                0
+  Starting value information                           UNPERTURBED
+  Treatment of categorical mediator                         LATENT
+  Algorithm used for Markov chain Monte Carlo            GIBBS(RW)
+  Convergence criterion                                  0.500D-01
+  Maximum number of iterations                               50000
+  K-th iteration used for thinning                               1
+
+Input data file(s)
+  moderation.4.dat
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+     Number of missing data patterns            27
+
+
+     PROPORTION OF DATA PRESENT
+
+
+           Covariance Coverage
+              BINAGGR2      BINWITH2      BINHYP2       A1PPVT4W      A1WJAPW
+              ________      ________      ________      ________      ________
+ BINAGGR2       0.945
+ BINWITH2       0.945         0.945
+ BINHYP2        0.945         0.945         0.947
+ A1PPVT4W       0.945         0.945         0.947         1.000
+ A1WJAPW        0.908         0.908         0.910         0.963         0.963
+ A1CSR          0.945         0.945         0.947         1.000         0.963
+ R1ATTUDE       0.922         0.922         0.923         0.963         0.928
+ R1MOTIVE       0.922         0.922         0.923         0.963         0.928
+ R1PRSIST       0.922         0.922         0.923         0.963         0.928
+ A2PPVT4W       0.940         0.940         0.942         0.995         0.958
+ A2WJAPW        0.932         0.932         0.933         0.987         0.953
+ A2CSR          0.945         0.945         0.947         1.000         0.963
+ R2ATTUDE       0.945         0.945         0.947         0.947         0.910
+ R2MOTIVE       0.945         0.945         0.947         0.947         0.910
+ R2PRSIST       0.945         0.945         0.947         0.947         0.910
+ A3PPVT4W       0.835         0.835         0.837         0.882         0.847
+ A3WJAPW        0.833         0.833         0.835         0.878         0.843
+ A3CSR          0.835         0.835         0.837         0.882         0.847
+ KR3ATUDE       0.652         0.652         0.653         0.688         0.668
+ KR3MOTIV       0.652         0.652         0.653         0.688         0.668
+ KR3PRSST       0.652         0.652         0.653         0.688         0.668
+ CHGENDER       0.945         0.945         0.947         1.000         0.963
+ A1CAGE         0.945         0.945         0.947         1.000         0.963
+ A2CAGE         0.945         0.945         0.947         1.000         0.963
+ ED1            0.945         0.945         0.947         1.000         0.963
+ ED2            0.945         0.945         0.947         1.000         0.963
+ ED3            0.945         0.945         0.947         1.000         0.963
+ PTYPE1         0.945         0.945         0.947         1.000         0.963
+ PTYPE2         0.945         0.945         0.947         1.000         0.963
+ PTYPE3         0.945         0.945         0.947         1.000         0.963
+
+
+           Covariance Coverage
+              A1CSR         R1ATTUDE      R1MOTIVE      R1PRSIST      A2PPVT4W
+              ________      ________      ________      ________      ________
+ A1CSR          1.000
+ R1ATTUDE       0.963         0.963
+ R1MOTIVE       0.963         0.963         0.963
+ R1PRSIST       0.963         0.963         0.963         0.963
+ A2PPVT4W       0.995         0.958         0.958         0.958         0.995
+ A2WJAPW        0.987         0.950         0.950         0.950         0.983
+ A2CSR          1.000         0.963         0.963         0.963         0.995
+ R2ATTUDE       0.947         0.923         0.923         0.923         0.942
+ R2MOTIVE       0.947         0.923         0.923         0.923         0.942
+ R2PRSIST       0.947         0.923         0.923         0.923         0.942
+ A3PPVT4W       0.882         0.847         0.847         0.847         0.877
+ A3WJAPW        0.878         0.843         0.843         0.843         0.873
+ A3CSR          0.882         0.847         0.847         0.847         0.877
+ KR3ATUDE       0.688         0.672         0.672         0.672         0.685
+ KR3MOTIV       0.688         0.672         0.672         0.672         0.685
+ KR3PRSST       0.688         0.672         0.672         0.672         0.685
+ CHGENDER       1.000         0.963         0.963         0.963         0.995
+ A1CAGE         1.000         0.963         0.963         0.963         0.995
+ A2CAGE         1.000         0.963         0.963         0.963         0.995
+ ED1            1.000         0.963         0.963         0.963         0.995
+ ED2            1.000         0.963         0.963         0.963         0.995
+ ED3            1.000         0.963         0.963         0.963         0.995
+ PTYPE1         1.000         0.963         0.963         0.963         0.995
+ PTYPE2         1.000         0.963         0.963         0.963         0.995
+ PTYPE3         1.000         0.963         0.963         0.963         0.995
+
+
+           Covariance Coverage
+              A2WJAPW       A2CSR         R2ATTUDE      R2MOTIVE      R2PRSIST
+              ________      ________      ________      ________      ________
+ A2WJAPW        0.987
+ A2CSR          0.987         1.000
+ R2ATTUDE       0.933         0.947         0.947
+ R2MOTIVE       0.933         0.947         0.947         0.947
+ R2PRSIST       0.933         0.947         0.947         0.947         0.947
+ A3PPVT4W       0.870         0.882         0.837         0.837         0.837
+ A3WJAPW        0.867         0.878         0.835         0.835         0.835
+ A3CSR          0.870         0.882         0.837         0.837         0.837
+ KR3ATUDE       0.680         0.688         0.653         0.653         0.653
+ KR3MOTIV       0.680         0.688         0.653         0.653         0.653
+ KR3PRSST       0.680         0.688         0.653         0.653         0.653
+ CHGENDER       0.987         1.000         0.947         0.947         0.947
+ A1CAGE         0.987         1.000         0.947         0.947         0.947
+ A2CAGE         0.987         1.000         0.947         0.947         0.947
+ ED1            0.987         1.000         0.947         0.947         0.947
+ ED2            0.987         1.000         0.947         0.947         0.947
+ ED3            0.987         1.000         0.947         0.947         0.947
+ PTYPE1         0.987         1.000         0.947         0.947         0.947
+ PTYPE2         0.987         1.000         0.947         0.947         0.947
+ PTYPE3         0.987         1.000         0.947         0.947         0.947
+
+
+           Covariance Coverage
+              A3PPVT4W      A3WJAPW       A3CSR         KR3ATUDE      KR3MOTIV
+              ________      ________      ________      ________      ________
+ A3PPVT4W       0.882
+ A3WJAPW        0.878         0.878
+ A3CSR          0.882         0.878         0.882
+ KR3ATUDE       0.593         0.590         0.593         0.688
+ KR3MOTIV       0.593         0.590         0.593         0.688         0.688
+ KR3PRSST       0.593         0.590         0.593         0.688         0.688
+ CHGENDER       0.882         0.878         0.882         0.688         0.688
+ A1CAGE         0.882         0.878         0.882         0.688         0.688
+ A2CAGE         0.882         0.878         0.882         0.688         0.688
+ ED1            0.882         0.878         0.882         0.688         0.688
+ ED2            0.882         0.878         0.882         0.688         0.688
+ ED3            0.882         0.878         0.882         0.688         0.688
+ PTYPE1         0.882         0.878         0.882         0.688         0.688
+ PTYPE2         0.882         0.878         0.882         0.688         0.688
+ PTYPE3         0.882         0.878         0.882         0.688         0.688
+
+
+           Covariance Coverage
+              KR3PRSST      CHGENDER      A1CAGE        A2CAGE        ED1
+              ________      ________      ________      ________      ________
+ KR3PRSST       0.688
+ CHGENDER       0.688         1.000
+ A1CAGE         0.688         1.000         1.000
+ A2CAGE         0.688         1.000         1.000         1.000
+ ED1            0.688         1.000         1.000         1.000         1.000
+ ED2            0.688         1.000         1.000         1.000         1.000
+ ED3            0.688         1.000         1.000         1.000         1.000
+ PTYPE1         0.688         1.000         1.000         1.000         1.000
+ PTYPE2         0.688         1.000         1.000         1.000         1.000
+ PTYPE3         0.688         1.000         1.000         1.000         1.000
+
+
+           Covariance Coverage
+              ED2           ED3           PTYPE1        PTYPE2        PTYPE3
+              ________      ________      ________      ________      ________
+ ED2            1.000
+ ED3            1.000         1.000
+ PTYPE1         1.000         1.000         1.000
+ PTYPE2         1.000         1.000         1.000         1.000
+ PTYPE3         1.000         1.000         1.000         1.000         1.000
+
+
+UNIVARIATE PROPORTIONS AND COUNTS FOR CATEGORICAL VARIABLES
+
+    BINAGGR2
+      Category 1    0.494      280.000
+      Category 2    0.506      287.000
+    BINWITH2
+      Category 1    0.413      234.000
+      Category 2    0.587      333.000
+    BINHYP2
+      Category 1    0.375      213.000
+      Category 2    0.625      355.000
+
+
+
+     THE CONVERGENCE CRITERION IS NOT SATISFIED.
+     INCREASE THE MAXIMUM NUMBER OF ITERATIONS OR INCREASE
+     THE CONVERGENCE CRITERION.
+
+
+
+
+
+
+MODEL RESULTS
+
+                    Estimate
+
+ COG1     BY
+    A1WJAPW            1.272
+    A1PPVT4W           0.877
+    A1CSR              9.485
+
+ COG2     BY
+    A2WJAPW            1.272
+    A2PPVT4W           0.877
+    A2CSR              9.485
+
+ COG3     BY
+    A3WJAPW            1.272
+    A3PPVT4W           0.877
+    A3CSR              9.485
+
+ ATL1     BY
+    R1ATTUDE           6.950
+    R1MOTIVE           6.476
+    R1PRSIST           8.077
+
+ ATL2     BY
+    R2ATTUDE           6.950
+    R2MOTIVE           6.476
+    R2PRSIST           8.077
+
+ ATL3     BY
+    KR3ATUDE           6.950
+    KR3MOTIV           6.476
+    KR3PRSST           8.077
+
+ PROB2    BY
+    BINAGGR2           1.125
+    BINWITH2           0.623
+    BINHYP2            2.240
+
+ COG2       ON
+    COG1               0.834
+    ATL1               0.033
+
+ ATL2       ON
+    COG1               0.230
+    ATL1               0.658
+
+ COG3       ON
+    COG2               0.835
+    ATL2               0.120
+    PROB2              0.036
+
+ ATL3       ON
+    COG2               0.423
+    ATL2               0.080
+    PROB2             -0.393
+
+ COG3       ON
+    PTYPE3             0.067
+
+ ATL3       ON
+    PTYPE3            -0.084
+
+ COG1       ON
+    CHGENDER          -0.538
+    ED1               -0.747
+    ED2               -0.441
+    ED3               -0.286
+    PTYPE1             0.113
+    A1CAGE             0.084
+
+ ATL1       ON
+    PTYPE1             0.193
+    CHGENDER          -0.501
+    ED1               -0.213
+    ED2               -0.206
+    ED3               -0.073
+    A1CAGE             0.035
+
+ PROB2      ON
+    CHGENDER           0.432
+    ED1               -0.031
+    ED2                0.120
+    ED3                0.138
+    A2CAGE            -0.003
+    PTYPE2            -0.232
+
+ ATL1     WITH
+    COG1               0.367
+
+ ATL2     WITH
+    COG2               0.057
+
+ ATL3     WITH
+    COG3               0.095
+
+ COG2     WITH
+    PROB2             -0.008
+
+ A1WJAPW  WITH
+    A2WJAPW            0.487
+    A3WJAPW            0.269
+
+ A2WJAPW  WITH
+    A3WJAPW            1.124
+
+ A1PPVT4W WITH
+    A2PPVT4W           0.654
+    A3PPVT4W           0.582
+
+ A2PPVT4W WITH
+    A3PPVT4W           0.548
+
+ A1CSR    WITH
+    A2CSR              0.956
+    A3CSR              1.111
+
+ A2CSR    WITH
+    A3CSR             -2.666
+
+ R1ATTUDE WITH
+    R2ATTUDE          10.562
+    KR3ATUDE           7.126
+
+ R2ATTUDE WITH
+    KR3ATUDE           7.193
+
+ R1MOTIVE WITH
+    R2MOTIVE          23.184
+    KR3MOTIV          15.694
+
+ R2MOTIVE WITH
+    KR3MOTIV          16.528
+
+ R1PRSIST WITH
+    R2PRSIST           5.598
+    KR3PRSST           2.709
+
+ R2PRSIST WITH
+    KR3PRSST           1.596
+
+ Intercepts
+    A1PPVT4W           7.383
+    A1WJAPW           32.984
+    A1CSR             25.037
+    R1ATTUDE          41.529
+    R1MOTIVE          41.602
+    R1PRSIST          39.436
+    A2PPVT4W           8.903
+    A2WJAPW           35.763
+    A2CSR             30.282
+    R2ATTUDE          39.171
+    R2MOTIVE          40.102
+    R2PRSIST          36.934
+    A3PPVT4W          10.871
+    A3WJAPW           38.909
+    A3CSR             38.915
+    KR3ATUDE          40.579
+    KR3MOTIV          40.080
+    KR3PRSST          36.902
+
+ Thresholds
+    BINAGGR2$1        -0.037
+    BINWITH2$1        -0.252
+    BINHYP2$1         -0.694
+
+ Residual Variances
+    A1PPVT4W           1.763
+    A1WJAPW            5.084
+    A1CSR            171.265
+    R1ATTUDE          25.006
+    R1MOTIVE          46.538
+    R1PRSIST          17.306
+    A2PPVT4W           1.216
+    A2WJAPW            2.125
+    A2CSR            147.267
+    R2ATTUDE          27.509
+    R2MOTIVE          44.451
+    R2PRSIST          13.128
+    A3PPVT4W           1.141
+    A3WJAPW            2.634
+    A3CSR            151.506
+    KR3ATUDE          32.964
+    KR3MOTIV          62.397
+    KR3PRSST          28.365
+    COG1               1.000
+    COG2               0.172
+    COG3               0.362
+    ATL1               1.000
+    ATL2               0.608
+    ATL3               1.004
+    PROB2              1.000
+
+
+MODEL COMMAND WITH FINAL ESTIMATES USED AS STARTING VALUES
+
+     cog1 BY a1wjapw*1.27248 (23);
+     cog1 BY a1ppvt4w*0.87714 (22);
+     cog1 BY a1csr*9.48461 (24);
+     cog2 BY a2wjapw*1.27248 (23);
+     cog2 BY a2ppvt4w*0.87714 (22);
+     cog2 BY a2csr*9.48461 (24);
+     cog3 BY a3wjapw*1.27248 (23);
+     cog3 BY a3ppvt4w*0.87714 (22);
+     cog3 BY a3csr*9.48461 (24);
+     atl1 BY r1attude*6.94978 (25);
+     atl1 BY r1motive*6.47562 (26);
+     atl1 BY r1prsist*8.07684 (27);
+     atl2 BY r2attude*6.94978 (25);
+     atl2 BY r2motive*6.47562 (26);
+     atl2 BY r2prsist*8.07684 (27);
+     atl3 BY kr3atude*6.94978 (25);
+     atl3 BY kr3motiv*6.47562 (26);
+     atl3 BY kr3prsst*8.07684 (27);
+     prob2 BY binaggr2*1.12497;
+     prob2 BY binwith2*0.62337;
+     prob2 BY binhyp2*2.23992;
+
+     cog3 ON ptype3*0.06688;
+     atl3 ON ptype3*-0.08442;
+     cog1 ON chgender*-0.53845;
+     cog1 ON ed1*-0.74734;
+     cog1 ON ed2*-0.44109;
+     cog1 ON ed3*-0.28626;
+     cog1 ON ptype1*0.11276;
+     cog1 ON a1cage*0.08417;
+     atl1 ON ptype1*0.19307;
+     atl1 ON chgender*-0.50085;
+     atl1 ON ed1*-0.21264;
+     atl1 ON ed2*-0.20603;
+     atl1 ON ed3*-0.07317;
+     atl1 ON a1cage*0.03487;
+     prob2 ON chgender*0.43151;
+     prob2 ON ed1*-0.03068;
+     prob2 ON ed2*0.12025;
+     prob2 ON ed3*0.13849;
+     prob2 ON a2cage*-0.00287;
+     prob2 ON ptype2*-0.23208;
+     cog2 ON cog1*0.83395;
+     cog2 ON atl1*0.03254;
+     atl2 ON cog1*0.23045;
+     atl2 ON atl1*0.65849;
+     cog3 ON cog2*0.83489;
+     cog3 ON atl2*0.12020;
+     cog3 ON prob2*0.03594;
+     atl3 ON cog2*0.42268;
+     atl3 ON atl2*0.07984;
+     atl3 ON prob2*-0.39290;
+
+     a1wjapw WITH a2wjapw*0.48671;
+     a1wjapw WITH a3wjapw*0.26889;
+     a2wjapw WITH a3wjapw*1.12423;
+     a1ppvt4w WITH a2ppvt4w*0.65402;
+     a1ppvt4w WITH a3ppvt4w*0.58204;
+     a2ppvt4w WITH a3ppvt4w*0.54789;
+     a1csr WITH a2csr*0.95613;
+     a1csr WITH a3csr*1.11096;
+     a2csr WITH a3csr*-2.66573;
+     r1attude WITH r2attude*10.56177;
+     r1attude WITH kr3atude*7.12612;
+     r2attude WITH kr3atude*7.19296;
+     r1motive WITH r2motive*23.18399;
+     r1motive WITH kr3motiv*15.69414;
+     r2motive WITH kr3motiv*16.52833;
+     r1prsist WITH r2prsist*5.59803;
+     r1prsist WITH kr3prsst*2.70889;
+     r2prsist WITH kr3prsst*1.59612;
+     atl1 WITH cog1*0.36674;
+     atl2 WITH cog2*0.05667;
+     atl3 WITH cog3*0.09509;
+     cog2 WITH prob2*-0.00826;
+
+     [ a1ppvt4w*7.38255 ];
+     [ a1wjapw*32.98419 ];
+     [ a1csr*25.03728 ];
+     [ r1attude*41.52913 ];
+     [ r1motive*41.60168 ];
+     [ r1prsist*39.43553 ];
+     [ a2ppvt4w*8.90283 ];
+     [ a2wjapw*35.76280 ];
+     [ a2csr*30.28171 ];
+     [ r2attude*39.17104 ];
+     [ r2motive*40.10227 ];
+     [ r2prsist*36.93423 ];
+     [ a3ppvt4w*10.87123 ];
+     [ a3wjapw*38.90856 ];
+     [ a3csr*38.91483 ];
+     [ kr3atude*40.57864 ];
+     [ kr3motiv*40.08020 ];
+     [ kr3prsst*36.90197 ];
+
+     [ binaggr2$1*-0.03664 ];
+     [ binwith2$1*-0.25175 ];
+     [ binhyp2$1*-0.69362 ];
+
+     a1ppvt4w*1.76299;
+     a1wjapw*5.08358;
+     a1csr*171.26547;
+     r1attude*25.00586;
+     r1motive*46.53823;
+     r1prsist*17.30618;
+     a2ppvt4w*1.21626;
+     a2wjapw*2.12470;
+     a2csr*147.26709;
+     r2attude*27.50912;
+     r2motive*44.45077;
+     r2prsist*13.12782;
+     a3ppvt4w*1.14056;
+     a3wjapw*2.63424;
+     a3csr*151.50647;
+     kr3atude*32.96448;
+     kr3motiv*62.39684;
+     kr3prsst*28.36526;
+     cog1@1;
+     cog2*0.17246;
+     cog3*0.36209;
+     atl1@1;
+     atl2*0.60809;
+     atl3*1.00445;
+     prob2@1;
+
+
+
+TECHNICAL 1 OUTPUT
+
+
+     PARAMETER SPECIFICATION
+
+
+           TAU
+              BINAGGR2      BINWITH2      BINHYP2$
+              ________      ________      ________
+ 1                102           103           104
+
+
+           NU
+              BINAGGR2      BINWITH2      BINHYP2       A1PPVT4W      A1WJAPW
+              ________      ________      ________      ________      ________
+ 1                  0             0             0             1             2
+
+
+           NU
+              A1CSR         R1ATTUDE      R1MOTIVE      R1PRSIST      A2PPVT4W
+              ________      ________      ________      ________      ________
+ 1                  3             4             5             6             7
+
+
+           NU
+              A2WJAPW       A2CSR         R2ATTUDE      R2MOTIVE      R2PRSIST
+              ________      ________      ________      ________      ________
+ 1                  8             9            10            11            12
+
+
+           NU
+              A3PPVT4W      A3WJAPW       A3CSR         KR3ATUDE      KR3MOTIV
+              ________      ________      ________      ________      ________
+ 1                 13            14            15            16            17
+
+
+           NU
+              KR3PRSST      CHGENDER      A1CAGE        A2CAGE        ED1
+              ________      ________      ________      ________      ________
+ 1                 18             0             0             0             0
+
+
+           NU
+              ED2           ED3           PTYPE1        PTYPE2        PTYPE3
+              ________      ________      ________      ________      ________
+ 1                  0             0             0             0             0
+
+
+           LAMBDA
+              COG1          COG2          COG3          ATL1          ATL2
+              ________      ________      ________      ________      ________
+ BINAGGR2           0             0             0             0             0
+ BINWITH2           0             0             0             0             0
+ BINHYP2            0             0             0             0             0
+ A1PPVT4W          22             0             0             0             0
+ A1WJAPW           23             0             0             0             0
+ A1CSR             24             0             0             0             0
+ R1ATTUDE           0             0             0            25             0
+ R1MOTIVE           0             0             0            26             0
+ R1PRSIST           0             0             0            27             0
+ A2PPVT4W           0            22             0             0             0
+ A2WJAPW            0            23             0             0             0
+ A2CSR              0            24             0             0             0
+ R2ATTUDE           0             0             0             0            25
+ R2MOTIVE           0             0             0             0            26
+ R2PRSIST           0             0             0             0            27
+ A3PPVT4W           0             0            22             0             0
+ A3WJAPW            0             0            23             0             0
+ A3CSR              0             0            24             0             0
+ KR3ATUDE           0             0             0             0             0
+ KR3MOTIV           0             0             0             0             0
+ KR3PRSST           0             0             0             0             0
+ CHGENDER           0             0             0             0             0
+ A1CAGE             0             0             0             0             0
+ A2CAGE             0             0             0             0             0
+ ED1                0             0             0             0             0
+ ED2                0             0             0             0             0
+ ED3                0             0             0             0             0
+ PTYPE1             0             0             0             0             0
+ PTYPE2             0             0             0             0             0
+ PTYPE3             0             0             0             0             0
+
+
+           LAMBDA
+              ATL3          PROB2         CHGENDER      A1CAGE        A2CAGE
+              ________      ________      ________      ________      ________
+ BINAGGR2           0            19             0             0             0
+ BINWITH2           0            20             0             0             0
+ BINHYP2            0            21             0             0             0
+ A1PPVT4W           0             0             0             0             0
+ A1WJAPW            0             0             0             0             0
+ A1CSR              0             0             0             0             0
+ R1ATTUDE           0             0             0             0             0
+ R1MOTIVE           0             0             0             0             0
+ R1PRSIST           0             0             0             0             0
+ A2PPVT4W           0             0             0             0             0
+ A2WJAPW            0             0             0             0             0
+ A2CSR              0             0             0             0             0
+ R2ATTUDE           0             0             0             0             0
+ R2MOTIVE           0             0             0             0             0
+ R2PRSIST           0             0             0             0             0
+ A3PPVT4W           0             0             0             0             0
+ A3WJAPW            0             0             0             0             0
+ A3CSR              0             0             0             0             0
+ KR3ATUDE          25             0             0             0             0
+ KR3MOTIV          26             0             0             0             0
+ KR3PRSST          27             0             0             0             0
+ CHGENDER           0             0             0             0             0
+ A1CAGE             0             0             0             0             0
+ A2CAGE             0             0             0             0             0
+ ED1                0             0             0             0             0
+ ED2                0             0             0             0             0
+ ED3                0             0             0             0             0
+ PTYPE1             0             0             0             0             0
+ PTYPE2             0             0             0             0             0
+ PTYPE3             0             0             0             0             0
+
+
+           LAMBDA
+              ED1           ED2           ED3           PTYPE1        PTYPE2
+              ________      ________      ________      ________      ________
+ BINAGGR2           0             0             0             0             0
+ BINWITH2           0             0             0             0             0
+ BINHYP2            0             0             0             0             0
+ A1PPVT4W           0             0             0             0             0
+ A1WJAPW            0             0             0             0             0
+ A1CSR              0             0             0             0             0
+ R1ATTUDE           0             0             0             0             0
+ R1MOTIVE           0             0             0             0             0
+ R1PRSIST           0             0             0             0             0
+ A2PPVT4W           0             0             0             0             0
+ A2WJAPW            0             0             0             0             0
+ A2CSR              0             0             0             0             0
+ R2ATTUDE           0             0             0             0             0
+ R2MOTIVE           0             0             0             0             0
+ R2PRSIST           0             0             0             0             0
+ A3PPVT4W           0             0             0             0             0
+ A3WJAPW            0             0             0             0             0
+ A3CSR              0             0             0             0             0
+ KR3ATUDE           0             0             0             0             0
+ KR3MOTIV           0             0             0             0             0
+ KR3PRSST           0             0             0             0             0
+ CHGENDER           0             0             0             0             0
+ A1CAGE             0             0             0             0             0
+ A2CAGE             0             0             0             0             0
+ ED1                0             0             0             0             0
+ ED2                0             0             0             0             0
+ ED3                0             0             0             0             0
+ PTYPE1             0             0             0             0             0
+ PTYPE2             0             0             0             0             0
+ PTYPE3             0             0             0             0             0
+
+
+           LAMBDA
+              PTYPE3
+              ________
+ BINAGGR2           0
+ BINWITH2           0
+ BINHYP2            0
+ A1PPVT4W           0
+ A1WJAPW            0
+ A1CSR              0
+ R1ATTUDE           0
+ R1MOTIVE           0
+ R1PRSIST           0
+ A2PPVT4W           0
+ A2WJAPW            0
+ A2CSR              0
+ R2ATTUDE           0
+ R2MOTIVE           0
+ R2PRSIST           0
+ A3PPVT4W           0
+ A3WJAPW            0
+ A3CSR              0
+ KR3ATUDE           0
+ KR3MOTIV           0
+ KR3PRSST           0
+ CHGENDER           0
+ A1CAGE             0
+ A2CAGE             0
+ ED1                0
+ ED2                0
+ ED3                0
+ PTYPE1             0
+ PTYPE2             0
+ PTYPE3             0
+
+
+           THETA
+              BINAGGR2      BINWITH2      BINHYP2       A1PPVT4W      A1WJAPW
+              ________      ________      ________      ________      ________
+ BINAGGR2           0
+ BINWITH2           0             0
+ BINHYP2            0             0             0
+ A1PPVT4W           0             0             0            28
+ A1WJAPW            0             0             0             0            29
+ A1CSR              0             0             0             0             0
+ R1ATTUDE           0             0             0             0             0
+ R1MOTIVE           0             0             0             0             0
+ R1PRSIST           0             0             0             0             0
+ A2PPVT4W           0             0             0            34             0
+ A2WJAPW            0             0             0             0            36
+ A2CSR              0             0             0             0             0
+ R2ATTUDE           0             0             0             0             0
+ R2MOTIVE           0             0             0             0             0
+ R2PRSIST           0             0             0             0             0
+ A3PPVT4W           0             0             0            46             0
+ A3WJAPW            0             0             0             0            49
+ A3CSR              0             0             0             0             0
+ KR3ATUDE           0             0             0             0             0
+ KR3MOTIV           0             0             0             0             0
+ KR3PRSST           0             0             0             0             0
+ CHGENDER           0             0             0             0             0
+ A1CAGE             0             0             0             0             0
+ A2CAGE             0             0             0             0             0
+ ED1                0             0             0             0             0
+ ED2                0             0             0             0             0
+ ED3                0             0             0             0             0
+ PTYPE1             0             0             0             0             0
+ PTYPE2             0             0             0             0             0
+ PTYPE3             0             0             0             0             0
+
+
+           THETA
+              A1CSR         R1ATTUDE      R1MOTIVE      R1PRSIST      A2PPVT4W
+              ________      ________      ________      ________      ________
+ A1CSR             30
+ R1ATTUDE           0            31
+ R1MOTIVE           0             0            32
+ R1PRSIST           0             0             0            33
+ A2PPVT4W           0             0             0             0            35
+ A2WJAPW            0             0             0             0             0
+ A2CSR             38             0             0             0             0
+ R2ATTUDE           0            40             0             0             0
+ R2MOTIVE           0             0            42             0             0
+ R2PRSIST           0             0             0            44             0
+ A3PPVT4W           0             0             0             0            47
+ A3WJAPW            0             0             0             0             0
+ A3CSR             52             0             0             0             0
+ KR3ATUDE           0            55             0             0             0
+ KR3MOTIV           0             0            58             0             0
+ KR3PRSST           0             0             0            61             0
+ CHGENDER           0             0             0             0             0
+ A1CAGE             0             0             0             0             0
+ A2CAGE             0             0             0             0             0
+ ED1                0             0             0             0             0
+ ED2                0             0             0             0             0
+ ED3                0             0             0             0             0
+ PTYPE1             0             0             0             0             0
+ PTYPE2             0             0             0             0             0
+ PTYPE3             0             0             0             0             0
+
+
+           THETA
+              A2WJAPW       A2CSR         R2ATTUDE      R2MOTIVE      R2PRSIST
+              ________      ________      ________      ________      ________
+ A2WJAPW           37
+ A2CSR              0            39
+ R2ATTUDE           0             0            41
+ R2MOTIVE           0             0             0            43
+ R2PRSIST           0             0             0             0            45
+ A3PPVT4W           0             0             0             0             0
+ A3WJAPW           50             0             0             0             0
+ A3CSR              0            53             0             0             0
+ KR3ATUDE           0             0            56             0             0
+ KR3MOTIV           0             0             0            59             0
+ KR3PRSST           0             0             0             0            62
+ CHGENDER           0             0             0             0             0
+ A1CAGE             0             0             0             0             0
+ A2CAGE             0             0             0             0             0
+ ED1                0             0             0             0             0
+ ED2                0             0             0             0             0
+ ED3                0             0             0             0             0
+ PTYPE1             0             0             0             0             0
+ PTYPE2             0             0             0             0             0
+ PTYPE3             0             0             0             0             0
+
+
+           THETA
+              A3PPVT4W      A3WJAPW       A3CSR         KR3ATUDE      KR3MOTIV
+              ________      ________      ________      ________      ________
+ A3PPVT4W          48
+ A3WJAPW            0            51
+ A3CSR              0             0            54
+ KR3ATUDE           0             0             0            57
+ KR3MOTIV           0             0             0             0            60
+ KR3PRSST           0             0             0             0             0
+ CHGENDER           0             0             0             0             0
+ A1CAGE             0             0             0             0             0
+ A2CAGE             0             0             0             0             0
+ ED1                0             0             0             0             0
+ ED2                0             0             0             0             0
+ ED3                0             0             0             0             0
+ PTYPE1             0             0             0             0             0
+ PTYPE2             0             0             0             0             0
+ PTYPE3             0             0             0             0             0
+
+
+           THETA
+              KR3PRSST      CHGENDER      A1CAGE        A2CAGE        ED1
+              ________      ________      ________      ________      ________
+ KR3PRSST          63
+ CHGENDER           0             0
+ A1CAGE             0             0             0
+ A2CAGE             0             0             0             0
+ ED1                0             0             0             0             0
+ ED2                0             0             0             0             0
+ ED3                0             0             0             0             0
+ PTYPE1             0             0             0             0             0
+ PTYPE2             0             0             0             0             0
+ PTYPE3             0             0             0             0             0
+
+
+           THETA
+              ED2           ED3           PTYPE1        PTYPE2        PTYPE3
+              ________      ________      ________      ________      ________
+ ED2                0
+ ED3                0             0
+ PTYPE1             0             0             0
+ PTYPE2             0             0             0             0
+ PTYPE3             0             0             0             0             0
+
+
+           ALPHA
+              COG1          COG2          COG3          ATL1          ATL2
+              ________      ________      ________      ________      ________
+ 1                  0             0             0             0             0
+
+
+           ALPHA
+              ATL3          PROB2         CHGENDER      A1CAGE        A2CAGE
+              ________      ________      ________      ________      ________
+ 1                  0             0             0             0             0
+
+
+           ALPHA
+              ED1           ED2           ED3           PTYPE1        PTYPE2
+              ________      ________      ________      ________      ________
+ 1                  0             0             0             0             0
+
+
+           ALPHA
+              PTYPE3
+              ________
+ 1                  0
+
+
+           BETA
+              COG1          COG2          COG3          ATL1          ATL2
+              ________      ________      ________      ________      ________
+ COG1               0             0             0             0             0
+ COG2              70             0             0            71             0
+ COG3               0            72             0             0            73
+ ATL1               0             0             0             0             0
+ ATL2              82             0             0            83             0
+ ATL3               0            84             0             0            85
+ PROB2              0             0             0             0             0
+ CHGENDER           0             0             0             0             0
+ A1CAGE             0             0             0             0             0
+ A2CAGE             0             0             0             0             0
+ ED1                0             0             0             0             0
+ ED2                0             0             0             0             0
+ ED3                0             0             0             0             0
+ PTYPE1             0             0             0             0             0
+ PTYPE2             0             0             0             0             0
+ PTYPE3             0             0             0             0             0
+
+
+           BETA
+              ATL3          PROB2         CHGENDER      A1CAGE        A2CAGE
+              ________      ________      ________      ________      ________
+ COG1               0             0            64            65             0
+ COG2               0             0             0             0             0
+ COG3               0            74             0             0             0
+ ATL1               0             0            76            77             0
+ ATL2               0             0             0             0             0
+ ATL3               0            86             0             0             0
+ PROB2              0             0            88             0            89
+ CHGENDER           0             0             0             0             0
+ A1CAGE             0             0             0             0             0
+ A2CAGE             0             0             0             0             0
+ ED1                0             0             0             0             0
+ ED2                0             0             0             0             0
+ ED3                0             0             0             0             0
+ PTYPE1             0             0             0             0             0
+ PTYPE2             0             0             0             0             0
+ PTYPE3             0             0             0             0             0
+
+
+           BETA
+              ED1           ED2           ED3           PTYPE1        PTYPE2
+              ________      ________      ________      ________      ________
+ COG1              66            67            68            69             0
+ COG2               0             0             0             0             0
+ COG3               0             0             0             0             0
+ ATL1              78            79            80            81             0
+ ATL2               0             0             0             0             0
+ ATL3               0             0             0             0             0
+ PROB2             90            91            92             0            93
+ CHGENDER           0             0             0             0             0
+ A1CAGE             0             0             0             0             0
+ A2CAGE             0             0             0             0             0
+ ED1                0             0             0             0             0
+ ED2                0             0             0             0             0
+ ED3                0             0             0             0             0
+ PTYPE1             0             0             0             0             0
+ PTYPE2             0             0             0             0             0
+ PTYPE3             0             0             0             0             0
+
+
+           BETA
+              PTYPE3
+              ________
+ COG1               0
+ COG2               0
+ COG3              75
+ ATL1               0
+ ATL2               0
+ ATL3              87
+ PROB2              0
+ CHGENDER           0
+ A1CAGE             0
+ A2CAGE             0
+ ED1                0
+ ED2                0
+ ED3                0
+ PTYPE1             0
+ PTYPE2             0
+ PTYPE3             0
+
+
+           PSI
+              COG1          COG2          COG3          ATL1          ATL2
+              ________      ________      ________      ________      ________
+ COG1               0
+ COG2               0            94
+ COG3               0             0            95
+ ATL1              96             0             0             0
+ ATL2               0            97             0             0            98
+ ATL3               0             0            99             0             0
+ PROB2              0           101             0             0             0
+ CHGENDER           0             0             0             0             0
+ A1CAGE             0             0             0             0             0
+ A2CAGE             0             0             0             0             0
+ ED1                0             0             0             0             0
+ ED2                0             0             0             0             0
+ ED3                0             0             0             0             0
+ PTYPE1             0             0             0             0             0
+ PTYPE2             0             0             0             0             0
+ PTYPE3             0             0             0             0             0
+
+
+           PSI
+              ATL3          PROB2         CHGENDER      A1CAGE        A2CAGE
+              ________      ________      ________      ________      ________
+ ATL3             100
+ PROB2              0             0
+ CHGENDER           0             0             0
+ A1CAGE             0             0             0             0
+ A2CAGE             0             0             0             0             0
+ ED1                0             0             0             0             0
+ ED2                0             0             0             0             0
+ ED3                0             0             0             0             0
+ PTYPE1             0             0             0             0             0
+ PTYPE2             0             0             0             0             0
+ PTYPE3             0             0             0             0             0
+
+
+           PSI
+              ED1           ED2           ED3           PTYPE1        PTYPE2
+              ________      ________      ________      ________      ________
+ ED1                0
+ ED2                0             0
+ ED3                0             0             0
+ PTYPE1             0             0             0             0
+ PTYPE2             0             0             0             0             0
+ PTYPE3             0             0             0             0             0
+
+
+           PSI
+              PTYPE3
+              ________
+ PTYPE3             0
+
+
+     STARTING VALUES
+
+
+           TAU
+              BINAGGR2      BINWITH2      BINHYP2$
+              ________      ________      ________
+ 1             -0.014        -0.196        -0.284
+
+
+           NU
+              BINAGGR2      BINWITH2      BINHYP2       A1PPVT4W      A1WJAPW
+              ________      ________      ________      ________      ________
+ 1              0.000         0.000         0.000        10.806        38.102
+
+
+           NU
+              A1CSR         R1ATTUDE      R1MOTIVE      R1PRSIST      A2PPVT4W
+              ________      ________      ________      ________      ________
+ 1             62.140        51.982        52.174        52.109        11.804
+
+
+           NU
+              A2WJAPW       A2CSR         R2ATTUDE      R2MOTIVE      R2PRSIST
+              ________      ________      ________      ________      ________
+ 1             39.935        61.553        52.150        52.566        52.489
+
+
+           NU
+              A3PPVT4W      A3WJAPW       A3CSR         KR3ATUDE      KR3MOTIV
+              ________      ________      ________      ________      ________
+ 1             13.491        42.654        66.505        51.446        50.582
+
+
+           NU
+              KR3PRSST      CHGENDER      A1CAGE        A2CAGE        ED1
+              ________      ________      ________      ________      ________
+ 1             49.626         0.000         0.000         0.000         0.000
+
+
+           NU
+              ED2           ED3           PTYPE1        PTYPE2        PTYPE3
+              ________      ________      ________      ________      ________
+ 1              0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              COG1          COG2          COG3          ATL1          ATL2
+              ________      ________      ________      ________      ________
+ BINAGGR2       0.000         0.000         0.000         0.000         0.000
+ BINWITH2       0.000         0.000         0.000         0.000         0.000
+ BINHYP2        0.000         0.000         0.000         0.000         0.000
+ A1PPVT4W       1.000         0.000         0.000         0.000         0.000
+ A1WJAPW        1.000         0.000         0.000         0.000         0.000
+ A1CSR          1.000         0.000         0.000         0.000         0.000
+ R1ATTUDE       0.000         0.000         0.000         1.000         0.000
+ R1MOTIVE       0.000         0.000         0.000         1.000         0.000
+ R1PRSIST       0.000         0.000         0.000         1.000         0.000
+ A2PPVT4W       0.000         1.000         0.000         0.000         0.000
+ A2WJAPW        0.000         1.000         0.000         0.000         0.000
+ A2CSR          0.000         1.000         0.000         0.000         0.000
+ R2ATTUDE       0.000         0.000         0.000         0.000         1.000
+ R2MOTIVE       0.000         0.000         0.000         0.000         1.000
+ R2PRSIST       0.000         0.000         0.000         0.000         1.000
+ A3PPVT4W       0.000         0.000         1.000         0.000         0.000
+ A3WJAPW        0.000         0.000         1.000         0.000         0.000
+ A3CSR          0.000         0.000         1.000         0.000         0.000
+ KR3ATUDE       0.000         0.000         0.000         0.000         0.000
+ KR3MOTIV       0.000         0.000         0.000         0.000         0.000
+ KR3PRSST       0.000         0.000         0.000         0.000         0.000
+ CHGENDER       0.000         0.000         0.000         0.000         0.000
+ A1CAGE         0.000         0.000         0.000         0.000         0.000
+ A2CAGE         0.000         0.000         0.000         0.000         0.000
+ ED1            0.000         0.000         0.000         0.000         0.000
+ ED2            0.000         0.000         0.000         0.000         0.000
+ ED3            0.000         0.000         0.000         0.000         0.000
+ PTYPE1         0.000         0.000         0.000         0.000         0.000
+ PTYPE2         0.000         0.000         0.000         0.000         0.000
+ PTYPE3         0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              ATL3          PROB2         CHGENDER      A1CAGE        A2CAGE
+              ________      ________      ________      ________      ________
+ BINAGGR2       0.000         1.000         0.000         0.000         0.000
+ BINWITH2       0.000         1.000         0.000         0.000         0.000
+ BINHYP2        0.000         1.000         0.000         0.000         0.000
+ A1PPVT4W       0.000         0.000         0.000         0.000         0.000
+ A1WJAPW        0.000         0.000         0.000         0.000         0.000
+ A1CSR          0.000         0.000         0.000         0.000         0.000
+ R1ATTUDE       0.000         0.000         0.000         0.000         0.000
+ R1MOTIVE       0.000         0.000         0.000         0.000         0.000
+ R1PRSIST       0.000         0.000         0.000         0.000         0.000
+ A2PPVT4W       0.000         0.000         0.000         0.000         0.000
+ A2WJAPW        0.000         0.000         0.000         0.000         0.000
+ A2CSR          0.000         0.000         0.000         0.000         0.000
+ R2ATTUDE       0.000         0.000         0.000         0.000         0.000
+ R2MOTIVE       0.000         0.000         0.000         0.000         0.000
+ R2PRSIST       0.000         0.000         0.000         0.000         0.000
+ A3PPVT4W       0.000         0.000         0.000         0.000         0.000
+ A3WJAPW        0.000         0.000         0.000         0.000         0.000
+ A3CSR          0.000         0.000         0.000         0.000         0.000
+ KR3ATUDE       1.000         0.000         0.000         0.000         0.000
+ KR3MOTIV       1.000         0.000         0.000         0.000         0.000
+ KR3PRSST       1.000         0.000         0.000         0.000         0.000
+ CHGENDER       0.000         0.000         1.000         0.000         0.000
+ A1CAGE         0.000         0.000         0.000         1.000         0.000
+ A2CAGE         0.000         0.000         0.000         0.000         1.000
+ ED1            0.000         0.000         0.000         0.000         0.000
+ ED2            0.000         0.000         0.000         0.000         0.000
+ ED3            0.000         0.000         0.000         0.000         0.000
+ PTYPE1         0.000         0.000         0.000         0.000         0.000
+ PTYPE2         0.000         0.000         0.000         0.000         0.000
+ PTYPE3         0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              ED1           ED2           ED3           PTYPE1        PTYPE2
+              ________      ________      ________      ________      ________
+ BINAGGR2       0.000         0.000         0.000         0.000         0.000
+ BINWITH2       0.000         0.000         0.000         0.000         0.000
+ BINHYP2        0.000         0.000         0.000         0.000         0.000
+ A1PPVT4W       0.000         0.000         0.000         0.000         0.000
+ A1WJAPW        0.000         0.000         0.000         0.000         0.000
+ A1CSR          0.000         0.000         0.000         0.000         0.000
+ R1ATTUDE       0.000         0.000         0.000         0.000         0.000
+ R1MOTIVE       0.000         0.000         0.000         0.000         0.000
+ R1PRSIST       0.000         0.000         0.000         0.000         0.000
+ A2PPVT4W       0.000         0.000         0.000         0.000         0.000
+ A2WJAPW        0.000         0.000         0.000         0.000         0.000
+ A2CSR          0.000         0.000         0.000         0.000         0.000
+ R2ATTUDE       0.000         0.000         0.000         0.000         0.000
+ R2MOTIVE       0.000         0.000         0.000         0.000         0.000
+ R2PRSIST       0.000         0.000         0.000         0.000         0.000
+ A3PPVT4W       0.000         0.000         0.000         0.000         0.000
+ A3WJAPW        0.000         0.000         0.000         0.000         0.000
+ A3CSR          0.000         0.000         0.000         0.000         0.000
+ KR3ATUDE       0.000         0.000         0.000         0.000         0.000
+ KR3MOTIV       0.000         0.000         0.000         0.000         0.000
+ KR3PRSST       0.000         0.000         0.000         0.000         0.000
+ CHGENDER       0.000         0.000         0.000         0.000         0.000
+ A1CAGE         0.000         0.000         0.000         0.000         0.000
+ A2CAGE         0.000         0.000         0.000         0.000         0.000
+ ED1            1.000         0.000         0.000         0.000         0.000
+ ED2            0.000         1.000         0.000         0.000         0.000
+ ED3            0.000         0.000         1.000         0.000         0.000
+ PTYPE1         0.000         0.000         0.000         1.000         0.000
+ PTYPE2         0.000         0.000         0.000         0.000         1.000
+ PTYPE3         0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              PTYPE3
+              ________
+ BINAGGR2       0.000
+ BINWITH2       0.000
+ BINHYP2        0.000
+ A1PPVT4W       0.000
+ A1WJAPW        0.000
+ A1CSR          0.000
+ R1ATTUDE       0.000
+ R1MOTIVE       0.000
+ R1PRSIST       0.000
+ A2PPVT4W       0.000
+ A2WJAPW        0.000
+ A2CSR          0.000
+ R2ATTUDE       0.000
+ R2MOTIVE       0.000
+ R2PRSIST       0.000
+ A3PPVT4W       0.000
+ A3WJAPW        0.000
+ A3CSR          0.000
+ KR3ATUDE       0.000
+ KR3MOTIV       0.000
+ KR3PRSST       0.000
+ CHGENDER       0.000
+ A1CAGE         0.000
+ A2CAGE         0.000
+ ED1            0.000
+ ED2            0.000
+ ED3            0.000
+ PTYPE1         0.000
+ PTYPE2         0.000
+ PTYPE3         1.000
+
+
+           THETA
+              BINAGGR2      BINWITH2      BINHYP2       A1PPVT4W      A1WJAPW
+              ________      ________      ________      ________      ________
+ BINAGGR2       1.000
+ BINWITH2       0.000         1.000
+ BINHYP2        0.000         0.000         1.000
+ A1PPVT4W       0.000         0.000         0.000         1.422
+ A1WJAPW        0.000         0.000         0.000         0.000         3.032
+ A1CSR          0.000         0.000         0.000         0.000         0.000
+ R1ATTUDE       0.000         0.000         0.000         0.000         0.000
+ R1MOTIVE       0.000         0.000         0.000         0.000         0.000
+ R1PRSIST       0.000         0.000         0.000         0.000         0.000
+ A2PPVT4W       0.000         0.000         0.000         0.000         0.000
+ A2WJAPW        0.000         0.000         0.000         0.000         0.000
+ A2CSR          0.000         0.000         0.000         0.000         0.000
+ R2ATTUDE       0.000         0.000         0.000         0.000         0.000
+ R2MOTIVE       0.000         0.000         0.000         0.000         0.000
+ R2PRSIST       0.000         0.000         0.000         0.000         0.000
+ A3PPVT4W       0.000         0.000         0.000         0.000         0.000
+ A3WJAPW        0.000         0.000         0.000         0.000         0.000
+ A3CSR          0.000         0.000         0.000         0.000         0.000
+ KR3ATUDE       0.000         0.000         0.000         0.000         0.000
+ KR3MOTIV       0.000         0.000         0.000         0.000         0.000
+ KR3PRSST       0.000         0.000         0.000         0.000         0.000
+ CHGENDER       0.000         0.000         0.000         0.000         0.000
+ A1CAGE         0.000         0.000         0.000         0.000         0.000
+ A2CAGE         0.000         0.000         0.000         0.000         0.000
+ ED1            0.000         0.000         0.000         0.000         0.000
+ ED2            0.000         0.000         0.000         0.000         0.000
+ ED3            0.000         0.000         0.000         0.000         0.000
+ PTYPE1         0.000         0.000         0.000         0.000         0.000
+ PTYPE2         0.000         0.000         0.000         0.000         0.000
+ PTYPE3         0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              A1CSR         R1ATTUDE      R1MOTIVE      R1PRSIST      A2PPVT4W
+              ________      ________      ________      ________      ________
+ A1CSR        154.852
+ R1ATTUDE       0.000        41.784
+ R1MOTIVE       0.000         0.000        43.586
+ R1PRSIST       0.000         0.000         0.000        44.930
+ A2PPVT4W       0.000         0.000         0.000         0.000         1.108
+ A2WJAPW        0.000         0.000         0.000         0.000         0.000
+ A2CSR          0.000         0.000         0.000         0.000         0.000
+ R2ATTUDE       0.000         0.000         0.000         0.000         0.000
+ R2MOTIVE       0.000         0.000         0.000         0.000         0.000
+ R2PRSIST       0.000         0.000         0.000         0.000         0.000
+ A3PPVT4W       0.000         0.000         0.000         0.000         0.000
+ A3WJAPW        0.000         0.000         0.000         0.000         0.000
+ A3CSR          0.000         0.000         0.000         0.000         0.000
+ KR3ATUDE       0.000         0.000         0.000         0.000         0.000
+ KR3MOTIV       0.000         0.000         0.000         0.000         0.000
+ KR3PRSST       0.000         0.000         0.000         0.000         0.000
+ CHGENDER       0.000         0.000         0.000         0.000         0.000
+ A1CAGE         0.000         0.000         0.000         0.000         0.000
+ A2CAGE         0.000         0.000         0.000         0.000         0.000
+ ED1            0.000         0.000         0.000         0.000         0.000
+ ED2            0.000         0.000         0.000         0.000         0.000
+ ED3            0.000         0.000         0.000         0.000         0.000
+ PTYPE1         0.000         0.000         0.000         0.000         0.000
+ PTYPE2         0.000         0.000         0.000         0.000         0.000
+ PTYPE3         0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              A2WJAPW       A2CSR         R2ATTUDE      R2MOTIVE      R2PRSIST
+              ________      ________      ________      ________      ________
+ A2WJAPW        2.068
+ A2CSR          0.000       144.550
+ R2ATTUDE       0.000         0.000        44.561
+ R2MOTIVE       0.000         0.000         0.000        48.300
+ R2PRSIST       0.000         0.000         0.000         0.000        47.127
+ A3PPVT4W       0.000         0.000         0.000         0.000         0.000
+ A3WJAPW        0.000         0.000         0.000         0.000         0.000
+ A3CSR          0.000         0.000         0.000         0.000         0.000
+ KR3ATUDE       0.000         0.000         0.000         0.000         0.000
+ KR3MOTIV       0.000         0.000         0.000         0.000         0.000
+ KR3PRSST       0.000         0.000         0.000         0.000         0.000
+ CHGENDER       0.000         0.000         0.000         0.000         0.000
+ A1CAGE         0.000         0.000         0.000         0.000         0.000
+ A2CAGE         0.000         0.000         0.000         0.000         0.000
+ ED1            0.000         0.000         0.000         0.000         0.000
+ ED2            0.000         0.000         0.000         0.000         0.000
+ ED3            0.000         0.000         0.000         0.000         0.000
+ PTYPE1         0.000         0.000         0.000         0.000         0.000
+ PTYPE2         0.000         0.000         0.000         0.000         0.000
+ PTYPE3         0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              A3PPVT4W      A3WJAPW       A3CSR         KR3ATUDE      KR3MOTIV
+              ________      ________      ________      ________      ________
+ A3PPVT4W       0.982
+ A3WJAPW        0.000         2.205
+ A3CSR          0.000         0.000       137.197
+ KR3ATUDE       0.000         0.000         0.000        49.090
+ KR3MOTIV       0.000         0.000         0.000         0.000        67.382
+ KR3PRSST       0.000         0.000         0.000         0.000         0.000
+ CHGENDER       0.000         0.000         0.000         0.000         0.000
+ A1CAGE         0.000         0.000         0.000         0.000         0.000
+ A2CAGE         0.000         0.000         0.000         0.000         0.000
+ ED1            0.000         0.000         0.000         0.000         0.000
+ ED2            0.000         0.000         0.000         0.000         0.000
+ ED3            0.000         0.000         0.000         0.000         0.000
+ PTYPE1         0.000         0.000         0.000         0.000         0.000
+ PTYPE2         0.000         0.000         0.000         0.000         0.000
+ PTYPE3         0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              KR3PRSST      CHGENDER      A1CAGE        A2CAGE        ED1
+              ________      ________      ________      ________      ________
+ KR3PRSST      64.800
+ CHGENDER       0.000         0.000
+ A1CAGE         0.000         0.000         0.000
+ A2CAGE         0.000         0.000         0.000         0.000
+ ED1            0.000         0.000         0.000         0.000         0.000
+ ED2            0.000         0.000         0.000         0.000         0.000
+ ED3            0.000         0.000         0.000         0.000         0.000
+ PTYPE1         0.000         0.000         0.000         0.000         0.000
+ PTYPE2         0.000         0.000         0.000         0.000         0.000
+ PTYPE3         0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              ED2           ED3           PTYPE1        PTYPE2        PTYPE3
+              ________      ________      ________      ________      ________
+ ED2            0.000
+ ED3            0.000         0.000
+ PTYPE1         0.000         0.000         0.000
+ PTYPE2         0.000         0.000         0.000         0.000
+ PTYPE3         0.000         0.000         0.000         0.000         0.000
+
+
+           ALPHA
+              COG1          COG2          COG3          ATL1          ATL2
+              ________      ________      ________      ________      ________
+ 1              0.000         0.000         0.000         0.000         0.000
+
+
+           ALPHA
+              ATL3          PROB2         CHGENDER      A1CAGE        A2CAGE
+              ________      ________      ________      ________      ________
+ 1              0.000         0.000         0.000         0.000         0.000
+
+
+           ALPHA
+              ED1           ED2           ED3           PTYPE1        PTYPE2
+              ________      ________      ________      ________      ________
+ 1              0.000         0.000         0.000         0.000         0.000
+
+
+           ALPHA
+              PTYPE3
+              ________
+ 1              0.000
+
+
+           BETA
+              COG1          COG2          COG3          ATL1          ATL2
+              ________      ________      ________      ________      ________
+ COG1           0.000         0.000         0.000         0.000         0.000
+ COG2           0.000         0.000         0.000         0.000         0.000
+ COG3           0.000         0.000         0.000         0.000         0.000
+ ATL1           0.000         0.000         0.000         0.000         0.000
+ ATL2           0.000         0.000         0.000         0.000         0.000
+ ATL3           0.000         0.000         0.000         0.000         0.000
+ PROB2          0.000         0.000         0.000         0.000         0.000
+ CHGENDER       0.000         0.000         0.000         0.000         0.000
+ A1CAGE         0.000         0.000         0.000         0.000         0.000
+ A2CAGE         0.000         0.000         0.000         0.000         0.000
+ ED1            0.000         0.000         0.000         0.000         0.000
+ ED2            0.000         0.000         0.000         0.000         0.000
+ ED3            0.000         0.000         0.000         0.000         0.000
+ PTYPE1         0.000         0.000         0.000         0.000         0.000
+ PTYPE2         0.000         0.000         0.000         0.000         0.000
+ PTYPE3         0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              ATL3          PROB2         CHGENDER      A1CAGE        A2CAGE
+              ________      ________      ________      ________      ________
+ COG1           0.000         0.000         0.000         0.000         0.000
+ COG2           0.000         0.000         0.000         0.000         0.000
+ COG3           0.000         0.000         0.000         0.000         0.000
+ ATL1           0.000         0.000         0.000         0.000         0.000
+ ATL2           0.000         0.000         0.000         0.000         0.000
+ ATL3           0.000         0.000         0.000         0.000         0.000
+ PROB2          0.000         0.000         0.000         0.000         0.000
+ CHGENDER       0.000         0.000         0.000         0.000         0.000
+ A1CAGE         0.000         0.000         0.000         0.000         0.000
+ A2CAGE         0.000         0.000         0.000         0.000         0.000
+ ED1            0.000         0.000         0.000         0.000         0.000
+ ED2            0.000         0.000         0.000         0.000         0.000
+ ED3            0.000         0.000         0.000         0.000         0.000
+ PTYPE1         0.000         0.000         0.000         0.000         0.000
+ PTYPE2         0.000         0.000         0.000         0.000         0.000
+ PTYPE3         0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              ED1           ED2           ED3           PTYPE1        PTYPE2
+              ________      ________      ________      ________      ________
+ COG1           0.000         0.000         0.000         0.000         0.000
+ COG2           0.000         0.000         0.000         0.000         0.000
+ COG3           0.000         0.000         0.000         0.000         0.000
+ ATL1           0.000         0.000         0.000         0.000         0.000
+ ATL2           0.000         0.000         0.000         0.000         0.000
+ ATL3           0.000         0.000         0.000         0.000         0.000
+ PROB2          0.000         0.000         0.000         0.000         0.000
+ CHGENDER       0.000         0.000         0.000         0.000         0.000
+ A1CAGE         0.000         0.000         0.000         0.000         0.000
+ A2CAGE         0.000         0.000         0.000         0.000         0.000
+ ED1            0.000         0.000         0.000         0.000         0.000
+ ED2            0.000         0.000         0.000         0.000         0.000
+ ED3            0.000         0.000         0.000         0.000         0.000
+ PTYPE1         0.000         0.000         0.000         0.000         0.000
+ PTYPE2         0.000         0.000         0.000         0.000         0.000
+ PTYPE3         0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              PTYPE3
+              ________
+ COG1           0.000
+ COG2           0.000
+ COG3           0.000
+ ATL1           0.000
+ ATL2           0.000
+ ATL3           0.000
+ PROB2          0.000
+ CHGENDER       0.000
+ A1CAGE         0.000
+ A2CAGE         0.000
+ ED1            0.000
+ ED2            0.000
+ ED3            0.000
+ PTYPE1         0.000
+ PTYPE2         0.000
+ PTYPE3         0.000
+
+
+           PSI
+              COG1          COG2          COG3          ATL1          ATL2
+              ________      ________      ________      ________      ________
+ COG1           1.000
+ COG2           0.000         1.000
+ COG3           0.000         0.000         1.000
+ ATL1           0.000         0.000         0.000         1.000
+ ATL2           0.000         0.000         0.000         0.000         1.000
+ ATL3           0.000         0.000         0.000         0.000         0.000
+ PROB2          0.000         0.000         0.000         0.000         0.000
+ CHGENDER       0.000         0.000         0.000         0.000         0.000
+ A1CAGE         0.000         0.000         0.000         0.000         0.000
+ A2CAGE         0.000         0.000         0.000         0.000         0.000
+ ED1            0.000         0.000         0.000         0.000         0.000
+ ED2            0.000         0.000         0.000         0.000         0.000
+ ED3            0.000         0.000         0.000         0.000         0.000
+ PTYPE1         0.000         0.000         0.000         0.000         0.000
+ PTYPE2         0.000         0.000         0.000         0.000         0.000
+ PTYPE3         0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              ATL3          PROB2         CHGENDER      A1CAGE        A2CAGE
+              ________      ________      ________      ________      ________
+ ATL3           1.000
+ PROB2          0.000         1.000
+ CHGENDER       0.000         0.000         0.124
+ A1CAGE         0.000         0.000         0.000         6.770
+ A2CAGE         0.000         0.000         0.000         0.000         6.429
+ ED1            0.000         0.000         0.000         0.000         0.000
+ ED2            0.000         0.000         0.000         0.000         0.000
+ ED3            0.000         0.000         0.000         0.000         0.000
+ PTYPE1         0.000         0.000         0.000         0.000         0.000
+ PTYPE2         0.000         0.000         0.000         0.000         0.000
+ PTYPE3         0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              ED1           ED2           ED3           PTYPE1        PTYPE2
+              ________      ________      ________      ________      ________
+ ED1            0.097
+ ED2            0.000         0.113
+ ED3            0.000         0.000         0.099
+ PTYPE1         0.000         0.000         0.000         0.124
+ PTYPE2         0.000         0.000         0.000         0.000         0.124
+ PTYPE3         0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              PTYPE3
+              ________
+ PTYPE3         0.063
+
+
+
+     PRIORS FOR ALL PARAMETERS            PRIOR MEAN      PRIOR VARIANCE     PRIOR STD. DEV.
+
+     Parameter 1~N(0.000,infinity)           0.0000            infinity            infinity
+     Parameter 2~N(0.000,infinity)           0.0000            infinity            infinity
+     Parameter 3~N(0.000,infinity)           0.0000            infinity            infinity
+     Parameter 4~N(0.000,infinity)           0.0000            infinity            infinity
+     Parameter 5~N(0.000,infinity)           0.0000            infinity            infinity
+     Parameter 6~N(0.000,infinity)           0.0000            infinity            infinity
+     Parameter 7~N(0.000,infinity)           0.0000            infinity            infinity
+     Parameter 8~N(0.000,infinity)           0.0000            infinity            infinity
+     Parameter 9~N(0.000,infinity)           0.0000            infinity            infinity
+     Parameter 10~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 11~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 12~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 13~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 14~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 15~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 16~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 17~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 18~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 19~N(0.000,5.000)             0.0000              5.0000              2.2361
+     Parameter 20~N(0.000,5.000)             0.0000              5.0000              2.2361
+     Parameter 21~N(0.000,5.000)             0.0000              5.0000              2.2361
+     Parameter 22~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 23~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 24~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 25~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 26~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 27~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 28~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 29~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 30~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 31~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 32~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 33~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 34~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 35~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 36~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 37~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 38~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 39~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 40~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 41~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 42~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 43~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 44~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 45~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 46~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 47~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 48~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 49~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 50~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 51~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 52~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 53~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 54~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 55~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 56~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 57~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 58~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 59~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 60~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 61~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 62~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 63~IW(0.000,-4)             infinity            infinity            infinity
+     Parameter 64~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 65~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 66~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 67~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 68~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 69~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 70~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 71~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 72~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 73~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 74~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 75~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 76~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 77~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 78~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 79~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 80~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 81~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 82~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 83~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 84~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 85~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 86~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 87~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 88~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 89~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 90~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 91~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 92~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 93~N(0.000,infinity)          0.0000            infinity            infinity
+     Parameter 94~IW(1.000,4)
+     Parameter 95~IW(0.000,-3)             infinity            infinity            infinity
+     Parameter 96~IW(0.000,-3)
+     Parameter 97~IW(0.000,4)
+     Parameter 98~IW(1.000,4)
+     Parameter 99~IW(0.000,-3)             infinity            infinity            infinity
+     Parameter 100~IW(0.000,-3)            infinity            infinity            infinity
+     Parameter 101~IW(0.000,4)
+     Parameter 102~N(0.000,5.000)            0.0000              5.0000              2.2361
+     Parameter 103~N(0.000,5.000)            0.0000              5.0000              2.2361
+     Parameter 104~N(0.000,5.000)            0.0000              5.0000              2.2361
+
+
+DIAGRAM INFORMATION
+
+  Use View Diagram under the Diagram menu in the Mplus Editor to view the diagram.
+  If running Mplus from the Mplus Diagrammer, the diagram opens automatically.
+
+  Diagram output
+    c:\users\bfoste01\dropbox\new_faces\faces_project_r\weighted_3\all-set-10-30-14\bayes-10-30-14\3
+
+     Beginning Time:  11:05:42
+        Ending Time:  11:08:35
+       Elapsed Time:  00:02:53
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2014 Muthen & Muthen

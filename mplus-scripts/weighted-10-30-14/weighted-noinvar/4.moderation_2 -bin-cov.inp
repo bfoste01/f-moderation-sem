@@ -1,0 +1,171 @@
+  TITLE:
+    Full moderated model
+  DATA: FILE = "moderation.4.dat";
+  DEFINE: A1PPVT4W = A1PPVT4W/10;
+          A1WJLWW = A1WJLWW/10;
+          A2PPVT4W = A2PPVT4W/10;
+          A2WJLWW = A2WJLWW/10;
+          A3PPVT4W = A3PPVT4W/10;
+          A3WJLWW = A3WJLWW/10;
+          A1WJAPW = A1WJAPW/10;
+          A2WJAPW = A2WJAPW/10;
+          A3WJAPW = A3WJAPW/10;
+          ED1 = 0;
+          if (P1RMOMED == 1) then ED1 = 1;
+          ED2 = 0;
+          if (P1RMOMED == 2) then ED2 = 1;
+          ED3 = 0;
+          if (P1RMOMED == 3) then ED3 = 1;
+          ED4 = 0;
+          if (P1RMOMED == 4) then ED4 = 1;
+          PTYPE1 = 0;
+          if (P1PRGTYP ==1) then PTYPE1 = 0;
+          if (P1PRGTYP ==2) then PTYPE1 = 1;
+          PTYPE2 = 0;
+          if (P2PRGTYP ==1) then PTYPE2 = 0;
+          if (P2PRGTYP ==2) then PTYPE2 = 1;
+          PTYPE3 = 0;
+          if (P3PRGTYP ==4) then PTYPE3 = 0;
+          if (P3PRGTYP ==5) then PTYPE3 = 1;
+  VARIABLE:
+  NAMES = A1PPVT4W A1WJAPW A1WJLWW A1CSR A1ECMIRT A1WJSW R1ATTUDE R1MOTIVE R1PRSIST
+       A2PPVT4W A2WJAPW A2WJLWW A2CSR A2ECMIRT A2WJSW R2ATTUDE R2MOTIVE R2PRSIST
+       A3PPVT4W A3WJAPW A3WJLWW A3CSR A3ECMIRT A3WJSW KR3ATUDE KR3MOTIV KR3PRSST
+       R1TPLBS R2TPLBS KR3TPLBS STRAT PSU PRA12OTW CHGENDER P1RMOMED A1CAGE A2CAGE
+       A3CAGE CRACE P1PRGTYP P2PRGTYP P3PRGTYP O2CLSSCD O2CLSSIS O2CLSSLM O2CLSSQF
+       CLS1_ID CLS2_ID CLS3_ID R1BAGGR R1BWITH R1BHYPER R1ATTUDE_1 R2BAGGR R2BWITH
+       R2BHYPER KR3BAGGR KR3BHYPE KR3BWITH BINAGGR1 BINWITH1 BINHYP1 BINAGGR2 BINWITH2
+       BINHYP2 BINAGGR3 BINWITH3 BINHYP3;
+  USEVARIABLES = A1PPVT4W A1WJAPW A1CSR
+       R1ATTUDE R1MOTIVE R1PRSIST
+       A2PPVT4W A2WJAPW A2CSR
+       R2ATTUDE R2MOTIVE R2PRSIST
+       BINAGGR2 BINWITH2 BINHYP2
+       A3PPVT4W A3WJAPW A3CSR
+       KR3ATUDE KR3MOTIV KR3PRSST
+       STRAT PSU PRA12OTW CHGENDER A1CAGE A2CAGE
+       ED1 ED2 ED3  PTYPE1 PTYPE2 PTYPE3;
+  STRATIFICATION = STRAT;
+  CLUSTER = PSU;
+  WEIGHT = PRA12OTW;
+  CATEGORICAL= BINAGGR2 BINWITH2 BINHYP2;
+  MISSING=.;
+  ANALYSIS:
+    TYPE = COMPLEX RANDOM;
+    ITERATIONS = 10000;
+    ESTIMATOR = MLR;
+    PROCESSORS = 5;
+  MODEL:
+    cog1 BY A1WJAPW*(1)
+    A1PPVT4W(2)
+    A1CSR(3);
+    cog2 BY A2WJAPW*(1)
+    A2PPVT4W(2)
+    A2CSR(3);
+    cog3 BY A3WJAPW*(1)
+    A3PPVT4W(2)
+    A3CSR(3);
+    cog1@1.0;
+
+    atl1 BY R1ATTUDE*(4)
+    R1MOTIVE(5)
+    R1PRSIST(6);
+    atl2 BY R2ATTUDE*(4)
+    R2MOTIVE(5)
+    R2PRSIST(6);
+    atl3 BY KR3ATUDE*(4)
+    KR3MOTIV(5)
+    KR3PRSST(6);
+    atl1@1.0;
+
+    !allow some correlated residuals
+    !auto-correlations
+    A1WJAPW WITH A2WJAPW A3WJAPW;
+    A2WJAPW WITH A3WJAPW;
+    A1PPVT4W WITH A2PPVT4W A3PPVT4W;
+    A2PPVT4W WITH A3PPVT4W;
+    A1CSR WITH A2CSR A3CSR;
+    A2CSR WITH A3CSR;
+    R1ATTUDE WITH R2ATTUDE KR3ATUDE;
+    R2ATTUDE WITH KR3ATUDE;
+    R1MOTIVE WITH R2MOTIVE KR3MOTIV;
+    R2MOTIVE WITH KR3MOTIV;
+    R1PRSIST WITH R2PRSIST KR3PRSST;
+    R2PRSIST WITH KR3PRSST;
+
+    
+
+    !for same teacher ratings
+    R1ATTUDE WITH R2PRSIST R2MOTIVE;
+    R1PRSIST WITH R2MOTIVE R2ATTUDE;
+    R1MOTIVE WITH R2PRSIST R2ATTUDE;
+
+   !allowing only concurrent non-directional paths
+    atl1 WITH cog1;
+    atl2 WITH cog2;
+    atl3 WITH cog3;
+    cog2 WITH prob2;
+    !atl2 WITH prob2;
+
+   !cross-lagged paths
+    cog2 ON cog1;
+    atl2 ON cog1;
+    atl2 ON atl1;
+    cog2 ON atl1;
+    cog3 ON cog2;
+    cog3 ON atl2;
+    atl3 ON cog2;
+    atl3 ON atl2;
+
+    !for moderation variable
+    ! note this is a zero inflated varaible
+    prob2 BY BINAGGR2* BINWITH2 BINHYP2;
+    prob2@1.0;
+
+    mod2a | atl2 XWITH prob2;
+      !cog2 WITH mod2; !correlate with all other variables
+      ! sub this
+    prob2 WITH cog2;
+
+    mod2b | atl2 XWITH cog2;
+
+    atl3 ON mod2a;
+    cog3 ON mod2a;
+
+    atl3 ON mod2b;
+    cog3 ON mod2b;
+
+    !added these paths
+    cog3 ON prob2;
+    atl3 ON prob2;
+
+    !covariates at T1 only down stream effects free of cov influence
+    !prob added at T2
+
+    cog1 ON CHGENDER;
+    cog1 ON ED1;
+    cog1 ON ED2;
+    cog1 ON ED3;
+    cog3 ON PTYPE3;
+    atl1 ON PTYPE1;
+    cog1 ON PTYPE1;
+    atl3 ON PTYPE3;
+    atl1 ON CHGENDER;
+    atl1 ON ED1;
+    atl1 ON ED2;
+    atl1 ON ED3;
+    cog1 ON A1CAGE;
+    atl1 ON A1CAGE;
+    !added
+    prob2 ON CHGENDER;
+    prob2 ON ED1;
+    prob2 ON ED2;
+    prob2 ON ED3;
+    prob2 ON A2CAGE;
+    prob2 ON PTYPE2;
+    OUTPUT:
+      TECH1 TECH4
+      SAMPSTAT
+      modindices;
+      STANDARDIZED;
+

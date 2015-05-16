@@ -1,0 +1,411 @@
+VERSION 1.1.0
+INPUT
+TITLE:
+ Strong Invariance 1 freed wjap at time 1 freed A1CSR t1
+DATA:
+ FILE = "moderation.4.dat";
+VARIABLE:
+  NAMES = A1PPVT4W A1WJAPW A1WJLWW A1CSR A1ECMIRT A1WJSW R1ATTUDE R1MOTIVE R1PRSIST
+       A2PPVT4W A2WJAPW A2WJLWW A2CSR A2ECMIRT A2WJSW R2ATTUDE R2MOTIVE R2PRSIST
+       A3PPVT4W A3WJAPW A3WJLWW A3CSR A3ECMIRT A3WJSW KR3ATUDE KR3MOTIV KR3PRSST
+       R1TPLBS R2TPLBS KR3TPLBS STRAT PSU PRA12OTW CHGENDER P1RMOMED A1CAGE A2CAGE
+       A3CAGE CRACE P1PRGTYP P2PRGTYP P3PRGTYP O2CLSSCD O2CLSSIS O2CLSSLM O2CLSSQF
+       CLS1_ID CLS2_ID CLS3_ID R1BAGGR R1BWITH R1BHYPER R1ATTUDE_1 R2BAGGR R2BWITH
+       R2BHYPER KR3BAGGR KR3BHYPE KR3BWITH BINAGGR1 BINWITH1 BINHYP1 BINAGGR2 BINWITH2
+       BINHYP2 BINAGGR3 BINWITH3 BINHYP3;
+  USEVARIABLES = A1WJAPW A2WJAPW A3WJAPW A1PPVT4W A2PPVT4W A3PPVT4W A1CSR A2CSR A3CSR
+       R1ATTUDE R1MOTIVE R1PRSIST R2ATTUDE R2MOTIVE R2PRSIST KR3MOTIV KR3PRSST
+       KR3ATUDE STRAT PSU PRA12OTW;
+  STRATIFICATION = STRAT;
+  CLUSTER = PSU;
+  WEIGHT = PRA12OTW;
+  MISSING=.;
+DEFINE:
+ A1PPVT4W = A1PPVT4W/10;
+          A1WJLWW = A1WJLWW/10;
+          A2PPVT4W = A2PPVT4W/10;
+          A2WJLWW = A2WJLWW/10;
+          A3PPVT4W = A3PPVT4W/10;
+          A3WJLWW = A3WJLWW/10;
+          A1WJAPW = A1WJAPW/10;
+          A2WJAPW = A2WJAPW/10;
+          A3WJAPW = A3WJAPW/10;
+ANALYSIS:
+    TYPE = COMPLEX;
+    ITERATIONS = 10000;
+    ESTIMATOR =MLR;
+OUTPUT:
+    TECH1
+    SAMPSTAT
+    modindices;
+    STANDARDIZED;
+MODEL:
+    cog1 BY A1WJAPW*
+    A1PPVT4W(2)
+    A1CSR(3);
+    cog2 BY A2WJAPW*(1)
+    A2PPVT4W(2)
+    A2CSR(3);
+    cog3 BY A3WJAPW*(1)
+    A3PPVT4W(2)
+    A3CSR(3);
+    cog1@1.0;
+    atl1 BY R1ATTUDE*(4)
+    R1MOTIVE(5)
+    R1PRSIST(6);
+    atl2 BY R2ATTUDE*(4)
+    R2MOTIVE(5)
+    R2PRSIST(6);
+    atl3 BY KR3ATUDE*(4)
+    KR3MOTIV(5)
+    KR3PRSST(6);
+    atl1@1.0;
+    A1WJAPW WITH A2WJAPW A3WJAPW;
+    A2WJAPW WITH A3WJAPW;
+    A1PPVT4W WITH A2PPVT4W A3PPVT4W;
+    A2PPVT4W WITH A3PPVT4W;
+    A1CSR WITH A2CSR A3CSR;
+    A2CSR WITH A3CSR;
+    R1ATTUDE WITH R2ATTUDE KR3ATUDE;
+    R2ATTUDE WITH KR3ATUDE;
+    R1MOTIVE WITH R2MOTIVE KR3MOTIV;
+    R2MOTIVE WITH KR3MOTIV;
+    R1PRSIST WITH R2PRSIST KR3PRSST;
+    R2PRSIST WITH KR3PRSST;
+    [cog2 cog3];
+    [atl2 atl3];
+    [A1WJAPW A2WJAPW A3WJAPW](7);
+    [A1PPVT4W A2PPVT4W A3PPVT4W](8);
+    [A2CSR A3CSR](9);
+    [R1ATTUDE R2ATTUDE KR3ATUDE](10);
+    [R1MOTIVE R2MOTIVE KR3MOTIV](11);
+    [R1PRSIST R2PRSIST KR3PRSST](12);
+INPUT_END
+2
+2
+2
+2
+MLR
+1
+GENERAL
+0
+18
+6
+0
+a1wjapw a2wjapw a3wjapw a1ppvt4w a2ppvt4w a3ppvt4w a1csr a2csr a3csr r1attude r1motive r1prsist r2attude r2motive r2prsist kr3motiv kr3prsst kr3atude cog1 cog2 cog3 atl1 atl2 atl3
+1
+-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0
+0
+6
+cog1
+a1wjapw a1ppvt4w a1csr
+cog2
+a2wjapw a2ppvt4w a2csr
+cog3
+a3wjapw a3ppvt4w a3csr
+atl1
+r1attude r1motive r1prsist
+atl2
+r2attude r2motive r2prsist
+atl3
+kr3atude kr3motiv kr3prsst
+1 1 cog1 a1wjapw    0.959    0.209
+1 1 cog1 a1ppvt4w    1.362    0.085
+1 1 cog1 a1csr    6.733    0.785
+1 1 cog2 a2wjapw    2.264    0.127
+1 1 cog2 a2ppvt4w    1.362    0.085
+1 1 cog2 a2csr    6.733    0.785
+1 1 cog3 a3wjapw    2.264    0.127
+1 1 cog3 a3ppvt4w    1.362    0.085
+1 1 cog3 a3csr    6.733    0.785
+1 1 atl1 r1attude    6.980    0.291
+1 1 atl1 r1motive    6.694    0.305
+1 1 atl1 r1prsist    8.519    0.375
+1 1 atl2 r2attude    6.980    0.291
+1 1 atl2 r2motive    6.694    0.305
+1 1 atl2 r2prsist    8.519    0.375
+1 1 atl3 kr3atude    6.980    0.291
+1 1 atl3 kr3motiv    6.694    0.305
+1 1 atl3 kr3prsst    8.519    0.375
+2 1 a1wjapw a2wjapw    0.478    0.182
+2 1 a1wjapw a3wjapw    0.197    0.271
+2 1 a2wjapw a3wjapw    0.183    0.183
+2 1 a1ppvt4w a2ppvt4w    0.430    0.080
+2 1 a1ppvt4w a3ppvt4w    0.335    0.080
+2 1 a2ppvt4w a3ppvt4w    0.488    0.054
+2 1 a1csr a2csr   63.059   15.763
+2 1 a1csr a3csr   38.725   19.951
+2 1 a2csr a3csr   59.501   17.331
+2 1 r1attude r2attude   11.660    2.255
+2 1 r1attude kr3atude    6.316    2.285
+2 1 r2attude kr3atude    5.501    2.445
+2 1 r1motive r2motive   25.485    3.857
+2 1 r1motive kr3motiv   17.270    4.449
+2 1 r2motive kr3motiv   17.914    3.561
+2 1 r1prsist r2prsist    2.711    3.260
+2 1 r1prsist kr3prsst   -2.866    2.620
+2 1 r2prsist kr3prsst   -1.720    2.542
+2 1 cog2 cog1    0.653    0.082
+2 1 cog3 cog1    0.542    0.077
+2 1 cog3 cog2    0.491    0.069
+2 1 atl1 cog1    0.366    0.059
+2 1 atl1 cog2    0.287    0.046
+2 1 atl1 cog3    0.283    0.046
+2 1 atl2 cog1    0.315    0.068
+2 1 atl2 cog2    0.257    0.047
+2 1 atl2 cog3    0.265    0.056
+2 1 atl2 atl1    0.725    0.047
+2 1 atl3 cog1    0.475    0.094
+2 1 atl3 cog2    0.345    0.066
+2 1 atl3 cog3    0.367    0.067
+2 1 atl3 atl1    0.567    0.066
+2 1 atl3 atl2    0.520    0.084
+4 1 a1wjapw    5.245    0.435
+4 1 a2wjapw    0.959    0.156
+4 1 a3wjapw    1.670    0.361
+4 1 a1ppvt4w    0.904    0.154
+4 1 a2ppvt4w    0.915    0.059
+4 1 a3ppvt4w    0.951    0.099
+4 1 a1csr  230.120   15.253
+4 1 a2csr  252.544   17.173
+4 1 a3csr  259.284   30.219
+4 1 r1attude   26.015    2.211
+4 1 r1motive   54.244    5.723
+4 1 r1prsist   10.283    2.840
+4 1 r2attude   29.748    3.338
+4 1 r2motive   45.481    3.963
+4 1 r2prsist    8.084    5.173
+4 1 kr3motiv   62.508    6.497
+4 1 kr3prsst   19.172    4.869
+4 1 kr3atude   29.750    3.755
+5 1 cog1    1.000    0.000
+5 1 cog2    0.605    0.081
+5 1 cog3    0.553    0.066
+5 1 atl1    1.000    0.000
+5 1 atl2    1.123    0.075
+5 1 atl3    1.503    0.133
+11 1 cog1 a1wjapw    0.386    0.081
+11 1 cog1 a1ppvt4w    0.820    0.035
+11 1 cog1 a1csr    0.406    0.045
+11 1 cog2 a2wjapw    0.874    0.021
+11 1 cog2 a2ppvt4w    0.742    0.022
+11 1 cog2 a2csr    0.313    0.039
+11 1 cog3 a3wjapw    0.793    0.039
+11 1 cog3 a3ppvt4w    0.720    0.025
+11 1 cog3 a3csr    0.297    0.041
+11 1 atl1 r1attude    0.807    0.019
+11 1 atl1 r1motive    0.673    0.029
+11 1 atl1 r1prsist    0.936    0.019
+11 1 atl2 r2attude    0.805    0.020
+11 1 atl2 r2motive    0.725    0.026
+11 1 atl2 r2prsist    0.954    0.030
+11 1 atl3 kr3atude    0.843    0.017
+11 1 atl3 kr3motiv    0.720    0.027
+11 1 atl3 kr3prsst    0.922    0.022
+12 1 a1wjapw a2wjapw    0.213    0.076
+12 1 a1wjapw a3wjapw    0.066    0.086
+12 1 a2wjapw a3wjapw    0.144    0.127
+12 1 a1ppvt4w a2ppvt4w    0.473    0.071
+12 1 a1ppvt4w a3ppvt4w    0.362    0.083
+12 1 a2ppvt4w a3ppvt4w    0.523    0.038
+12 1 a1csr a2csr    0.262    0.057
+12 1 a1csr a3csr    0.159    0.078
+12 1 a2csr a3csr    0.233    0.057
+12 1 r1attude r2attude    0.419    0.064
+12 1 r1attude kr3atude    0.227    0.081
+12 1 r2attude kr3atude    0.185    0.076
+12 1 r1motive r2motive    0.513    0.045
+12 1 r1motive kr3motiv    0.297    0.076
+12 1 r2motive kr3motiv    0.336    0.059
+12 1 r1prsist r2prsist    0.297    0.245
+12 1 r1prsist kr3prsst   -0.204    0.201
+12 1 r2prsist kr3prsst   -0.138    0.223
+12 1 cog2 cog1    0.839    0.061
+12 1 cog3 cog1    0.729    0.088
+12 1 cog3 cog2    0.849    0.046
+12 1 atl1 cog1    0.366    0.059
+12 1 atl1 cog2    0.369    0.049
+12 1 atl1 cog3    0.380    0.060
+12 1 atl2 cog1    0.298    0.062
+12 1 atl2 cog2    0.312    0.045
+12 1 atl2 cog3    0.336    0.059
+12 1 atl2 atl1    0.684    0.036
+12 1 atl3 cog1    0.387    0.071
+12 1 atl3 cog2    0.361    0.062
+12 1 atl3 cog3    0.402    0.068
+12 1 atl3 atl1    0.462    0.049
+12 1 atl3 atl2    0.400    0.060
+14 1 a1wjapw    0.851    0.062
+14 1 a2wjapw    0.236    0.037
+14 1 a3wjapw    0.371    0.062
+14 1 a1ppvt4w    0.328    0.057
+14 1 a2ppvt4w    0.449    0.033
+14 1 a3ppvt4w    0.481    0.036
+14 1 a1csr    0.835    0.036
+14 1 a2csr    0.902    0.025
+14 1 a3csr    0.912    0.025
+14 1 r1attude    0.348    0.030
+14 1 r1motive    0.548    0.039
+14 1 r1prsist    0.124    0.035
+14 1 r2attude    0.352    0.032
+14 1 r2motive    0.475    0.037
+14 1 r2prsist    0.090    0.058
+14 1 kr3motiv    0.481    0.039
+14 1 kr3prsst    0.149    0.041
+14 1 kr3atude    0.289    0.029
+15 1 cog1    1.000    0.000
+15 1 cog2    1.000    0.000
+15 1 cog3    1.000    0.000
+15 1 atl1    1.000    0.000
+15 1 atl2    1.000    0.000
+15 1 atl3    1.000    0.000
+21 1 cog1 a1wjapw    0.386    0.081
+21 1 cog1 a1ppvt4w    0.820    0.035
+21 1 cog1 a1csr    0.406    0.045
+21 1 cog2 a2wjapw    0.874    0.021
+21 1 cog2 a2ppvt4w    0.742    0.022
+21 1 cog2 a2csr    0.313    0.039
+21 1 cog3 a3wjapw    0.793    0.039
+21 1 cog3 a3ppvt4w    0.720    0.025
+21 1 cog3 a3csr    0.297    0.041
+21 1 atl1 r1attude    0.807    0.019
+21 1 atl1 r1motive    0.673    0.029
+21 1 atl1 r1prsist    0.936    0.019
+21 1 atl2 r2attude    0.805    0.020
+21 1 atl2 r2motive    0.725    0.026
+21 1 atl2 r2prsist    0.954    0.030
+21 1 atl3 kr3atude    0.843    0.017
+21 1 atl3 kr3motiv    0.720    0.027
+21 1 atl3 kr3prsst    0.922    0.022
+22 1 a1wjapw a2wjapw    0.213    0.076
+22 1 a1wjapw a3wjapw    0.066    0.086
+22 1 a2wjapw a3wjapw    0.144    0.127
+22 1 a1ppvt4w a2ppvt4w    0.473    0.071
+22 1 a1ppvt4w a3ppvt4w    0.362    0.083
+22 1 a2ppvt4w a3ppvt4w    0.523    0.038
+22 1 a1csr a2csr    0.262    0.057
+22 1 a1csr a3csr    0.159    0.078
+22 1 a2csr a3csr    0.233    0.057
+22 1 r1attude r2attude    0.419    0.064
+22 1 r1attude kr3atude    0.227    0.081
+22 1 r2attude kr3atude    0.185    0.076
+22 1 r1motive r2motive    0.513    0.045
+22 1 r1motive kr3motiv    0.297    0.076
+22 1 r2motive kr3motiv    0.336    0.059
+22 1 r1prsist r2prsist    0.297    0.245
+22 1 r1prsist kr3prsst   -0.204    0.201
+22 1 r2prsist kr3prsst   -0.138    0.223
+22 1 cog2 cog1    0.839    0.061
+22 1 cog3 cog1    0.729    0.088
+22 1 cog3 cog2    0.849    0.046
+22 1 atl1 cog1    0.366    0.059
+22 1 atl1 cog2    0.369    0.049
+22 1 atl1 cog3    0.380    0.060
+22 1 atl2 cog1    0.298    0.062
+22 1 atl2 cog2    0.312    0.045
+22 1 atl2 cog3    0.336    0.059
+22 1 atl2 atl1    0.684    0.036
+22 1 atl3 cog1    0.387    0.071
+22 1 atl3 cog2    0.361    0.062
+22 1 atl3 cog3    0.402    0.068
+22 1 atl3 atl1    0.462    0.049
+22 1 atl3 atl2    0.400    0.060
+24 1 a1wjapw    0.851    0.062
+24 1 a2wjapw    0.236    0.037
+24 1 a3wjapw    0.371    0.062
+24 1 a1ppvt4w    0.328    0.057
+24 1 a2ppvt4w    0.449    0.033
+24 1 a3ppvt4w    0.481    0.036
+24 1 a1csr    0.835    0.036
+24 1 a2csr    0.902    0.025
+24 1 a3csr    0.912    0.025
+24 1 r1attude    0.348    0.030
+24 1 r1motive    0.548    0.039
+24 1 r1prsist    0.124    0.035
+24 1 r2attude    0.352    0.032
+24 1 r2motive    0.475    0.037
+24 1 r2prsist    0.090    0.058
+24 1 kr3motiv    0.481    0.039
+24 1 kr3prsst    0.149    0.041
+24 1 kr3atude    0.289    0.029
+25 1 cog1    1.000    0.000
+25 1 cog2    1.000    0.000
+25 1 cog3    1.000    0.000
+25 1 atl1    1.000    0.000
+25 1 atl2    1.000    0.000
+25 1 atl3    1.000    0.000
+31 1 cog1 a1wjapw    0.959    0.209
+31 1 cog1 a1ppvt4w    1.362    0.085
+31 1 cog1 a1csr    6.733    0.785
+31 1 cog2 a2wjapw    1.762    0.089
+31 1 cog2 a2ppvt4w    1.060    0.057
+31 1 cog2 a2csr    5.239    0.635
+31 1 cog3 a3wjapw    1.683    0.089
+31 1 cog3 a3ppvt4w    1.013    0.062
+31 1 cog3 a3csr    5.006    0.587
+31 1 atl1 r1attude    6.980    0.291
+31 1 atl1 r1motive    6.694    0.305
+31 1 atl1 r1prsist    8.519    0.375
+31 1 atl2 r2attude    7.396    0.323
+31 1 atl2 r2motive    7.093    0.368
+31 1 atl2 r2prsist    9.027    0.438
+31 1 atl3 kr3atude    8.558    0.371
+31 1 atl3 kr3motiv    8.207    0.413
+31 1 atl3 kr3prsst   10.445    0.568
+32 1 a1wjapw a2wjapw    0.478    0.182
+32 1 a1wjapw a3wjapw    0.197    0.271
+32 1 a2wjapw a3wjapw    0.183    0.183
+32 1 a1ppvt4w a2ppvt4w    0.430    0.080
+32 1 a1ppvt4w a3ppvt4w    0.335    0.080
+32 1 a2ppvt4w a3ppvt4w    0.488    0.054
+32 1 a1csr a2csr   63.059   15.763
+32 1 a1csr a3csr   38.725   19.951
+32 1 a2csr a3csr   59.501   17.331
+32 1 r1attude r2attude   11.660    2.255
+32 1 r1attude kr3atude    6.316    2.285
+32 1 r2attude kr3atude    5.501    2.445
+32 1 r1motive r2motive   25.485    3.857
+32 1 r1motive kr3motiv   17.270    4.449
+32 1 r2motive kr3motiv   17.914    3.561
+32 1 r1prsist r2prsist    2.711    3.260
+32 1 r1prsist kr3prsst   -2.866    2.620
+32 1 r2prsist kr3prsst   -1.720    2.542
+32 1 cog2 cog1    0.839    0.061
+32 1 cog3 cog1    0.729    0.088
+32 1 cog3 cog2    0.849    0.046
+32 1 atl1 cog1    0.366    0.059
+32 1 atl1 cog2    0.369    0.049
+32 1 atl1 cog3    0.380    0.060
+32 1 atl2 cog1    0.298    0.062
+32 1 atl2 cog2    0.312    0.045
+32 1 atl2 cog3    0.336    0.059
+32 1 atl2 atl1    0.684    0.036
+32 1 atl3 cog1    0.387    0.071
+32 1 atl3 cog2    0.361    0.062
+32 1 atl3 cog3    0.402    0.068
+32 1 atl3 atl1    0.462    0.049
+32 1 atl3 atl2    0.400    0.060
+34 1 a1wjapw    5.245    0.435
+34 1 a2wjapw    0.959    0.156
+34 1 a3wjapw    1.670    0.361
+34 1 a1ppvt4w    0.904    0.154
+34 1 a2ppvt4w    0.915    0.059
+34 1 a3ppvt4w    0.951    0.099
+34 1 a1csr  230.120   15.253
+34 1 a2csr  252.544   17.173
+34 1 a3csr  259.284   30.219
+34 1 r1attude   26.015    2.211
+34 1 r1motive   54.244    5.723
+34 1 r1prsist   10.283    2.840
+34 1 r2attude   29.748    3.338
+34 1 r2motive   45.481    3.963
+34 1 r2prsist    8.084    5.173
+34 1 kr3motiv   62.508    6.497
+34 1 kr3prsst   19.172    4.869
+34 1 kr3atude   29.750    3.755
+35 1 cog1    1.000    0.000
+35 1 cog2    1.000    0.000
+35 1 cog3    1.000    0.000
+35 1 atl1    1.000    0.000
+35 1 atl2    1.000    0.000
+35 1 atl3    1.000    0.000

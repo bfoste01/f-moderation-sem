@@ -1,0 +1,618 @@
+Mplus VERSION 7.3
+MUTHEN & MUTHEN
+10/30/2014   9:04 AM
+
+INPUT INSTRUCTIONS
+
+    TITLE:
+      Cross-lagged w/prob no weights
+    DATA: FILE = "moderation.4.dat";
+    DEFINE: A1PPVT4W = A1PPVT4W/10;
+            A1WJLWW = A1WJLWW/10;
+            A2PPVT4W = A2PPVT4W/10;
+            A2WJLWW = A2WJLWW/10;
+            A3PPVT4W = A3PPVT4W/10;
+            A3WJLWW = A3WJLWW/10;
+             A1WJAPW = A1WJAPW/10;
+            A2WJAPW = A2WJAPW/10;
+            A3WJAPW = A3WJAPW/10;
+    VARIABLE:
+    NAMES = A1PPVT4W A1WJAPW A1WJLWW A1CSR A1ECMIRT A1WJSW R1ATTUDE R1MOTIVE R1PRSIST
+         A2PPVT4W A2WJAPW A2WJLWW A2CSR A2ECMIRT A2WJSW R2ATTUDE R2MOTIVE R2PRSIST
+         A3PPVT4W A3WJAPW A3WJLWW A3CSR A3ECMIRT A3WJSW KR3ATUDE KR3MOTIV KR3PRSST
+         R1TPLBS R2TPLBS KR3TPLBS STRAT PSU PRA12OTW CHGENDER P1RMOMED A1CAGE A2CAGE
+         A3CAGE CRACE P1PRGTYP P2PRGTYP P3PRGTYP O2CLSSCD O2CLSSIS O2CLSSLM O2CLSSQF
+         CLS1_ID CLS2_ID CLS3_ID R1BAGGR R1BWITH R1BHYPER R1ATTUDE_1 R2BAGGR R2BWITH
+         R2BHYPER KR3BAGGR KR3BHYPE KR3BWITH BINAGGR1 BINWITH1 BINHYP1 BINAGGR2 BINWITH2
+         BINHYP2 BINAGGR3 BINWITH3 BINHYP3;
+    USEVARIABLES = A1PPVT4W A1WJAPW A1CSR
+         R1ATTUDE R1MOTIVE R1PRSIST
+         A2PPVT4W A2WJAPW A2CSR
+         R2ATTUDE R2MOTIVE R2PRSIST
+         BINAGGR2 BINWITH2 BINHYP2
+         A3PPVT4W A3WJAPW A3CSR
+         KR3ATUDE KR3MOTIV KR3PRSST
+         STRAT PSU PRA12OTW CHGENDER P1RMOMED A1CAGE A2CAGE
+         P1PRGTYP P2PRGTYP P3PRGTYP;
+    STRATIFICATION = STRAT;
+    CLUSTER = PSU;
+    WEIGHT = PRA12OTW;
+    CATEGORICAL= BINAGGR2 BINWITH2 BINHYP2;
+    MISSING=.;
+    ANALYSIS:
+      TYPE = COMPLEX;
+      ITERATIONS = 10000;
+      ESTIMATOR = WLSMV;
+      PROCESSORS = 5;
+    MODEL:
+      cog1 BY A1WJAPW*(1)
+      A1PPVT4W(2)
+      A1CSR(3);
+      cog2 BY A2WJAPW*(1)
+      A2PPVT4W(2)
+      A2CSR(3);
+      cog3 BY A3WJAPW*(1)
+      A3PPVT4W(2)
+      A3CSR(3);
+      cog1@1.0;
+
+      atl1 BY R1ATTUDE*(4)
+      R1MOTIVE(5)
+      R1PRSIST(6);
+      atl2 BY R2ATTUDE*(4)
+      R2MOTIVE(5)
+      R2PRSIST(6);
+      atl3 BY KR3ATUDE*(4)
+      KR3MOTIV(5)
+      KR3PRSST(6);
+      atl1@1.0;
+
+      !allow some correlated residuals
+      !auto-correlations
+      A1WJAPW WITH A2WJAPW A3WJAPW;
+      A2WJAPW WITH A3WJAPW;
+      A1PPVT4W WITH A2PPVT4W A3PPVT4W;
+      A2PPVT4W WITH A3PPVT4W;
+      A1CSR WITH A2CSR A3CSR;
+      A2CSR WITH A3CSR;
+      R1ATTUDE WITH R2ATTUDE KR3ATUDE;
+      R2ATTUDE WITH KR3ATUDE;
+      R1MOTIVE WITH R2MOTIVE KR3MOTIV;
+      R2MOTIVE WITH KR3MOTIV;
+      R1PRSIST WITH R2PRSIST KR3PRSST;
+      R2PRSIST WITH KR3PRSST;
+
+     !allowing only concurrent non-directional paths
+      atl1 WITH cog1;
+      atl2 WITH cog2;
+      atl3 WITH cog3;
+      cog2 WITH prob2;
+      atl2 WITH prob2;
+
+     !cross-lagged paths
+      cog2 ON cog1;
+      atl2 ON cog1;
+      atl2 ON atl1;
+      cog2 ON atl1;
+      cog3 ON cog2;
+      cog3 ON atl2;
+      atl3 ON cog2;
+      atl3 ON atl2;
+
+      !for moderation variable
+      ! note this is a zero inflated varaible
+      prob2 BY BINAGGR2* BINWITH2 BINHYP2;
+      prob2@1.0;
+
+      !added these paths
+      cog3 ON prob2;
+      atl3 ON prob2;
+
+      !covariates at T1 only down stream effects free of cov influence
+      !prob added at T2
+
+      cog1 ON CHGENDER;
+      cog1 ON P1RMOMED;
+      cog1 ON P1PRGTYP;
+      cog3 ON P3PRGTYP;
+      atl1 ON P1PRGTYP;
+      atl3 ON P3PRGTYP;
+      atl1 ON CHGENDER;
+      atl1 ON P1RMOMED;
+      cog1 ON A1CAGE;
+      atl1 ON A1CAGE;
+      !added
+      prob2 ON CHGENDER;
+      prob2 ON P1RMOMED;
+      prob2 ON A2CAGE;
+      prob2 ON P2PRGTYP;
+
+      OUTPUT:
+        TECH1 TECH4
+        SAMPSTAT
+        modindices;
+        STANDARDIZED;
+
+
+
+
+*** WARNING
+  Data set contains cases with missing on x-variables.
+  These cases were not included in the analysis.
+  Number of cases with missing on x-variables:  69
+   1 WARNING(S) FOUND IN THE INPUT INSTRUCTIONS
+
+
+
+
+Cross-lagged w/prob no weights
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                         552
+
+Number of dependent variables                                   21
+Number of independent variables                                  7
+Number of continuous latent variables                            7
+
+Observed dependent variables
+
+  Continuous
+   A1PPVT4W    A1WJAPW     A1CSR       R1ATTUDE    R1MOTIVE    R1PRSIST
+   A2PPVT4W    A2WJAPW     A2CSR       R2ATTUDE    R2MOTIVE    R2PRSIST
+   A3PPVT4W    A3WJAPW     A3CSR       KR3ATUDE    KR3MOTIV    KR3PRSST
+
+  Binary and ordered categorical (ordinal)
+   BINAGGR2    BINWITH2    BINHYP2
+
+Observed independent variables
+   CHGENDER    P1RMOMED    A1CAGE      A2CAGE      P1PRGTYP    P2PRGTYP
+   P3PRGTYP
+
+Continuous latent variables
+   COG1        COG2        COG3        ATL1        ATL2        ATL3
+   PROB2
+
+Variables with special functions
+
+  Stratification        STRAT
+  Cluster variable      PSU
+  Weight variable       PRA12OTW
+
+Estimator                                                    WLSMV
+Maximum number of iterations                                 10000
+Convergence criterion                                    0.500D-04
+Maximum number of steepest descent iterations                   20
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+Parameterization                                             DELTA
+
+Input data file(s)
+  moderation.4.dat
+
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns            26
+     Number of strata                      14
+     Number of clusters                    60
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+
+     PROPORTION OF DATA PRESENT
+
+
+           Covariance Coverage
+              A1PPVT4W      A1WJAPW       A1CSR         R1ATTUDE      R1MOTIVE
+              ________      ________      ________      ________      ________
+ A1PPVT4W       1.000
+ A1WJAPW        0.966         0.966
+ A1CSR          1.000         0.966         1.000
+ R1ATTUDE       0.962         0.929         0.962         0.962
+ R1MOTIVE       0.962         0.929         0.962         0.962         0.962
+ R1PRSIST       0.962         0.929         0.962         0.962         0.962
+ A2PPVT4W       0.995         0.960         0.995         0.957         0.957
+ A2WJAPW        0.987         0.955         0.987         0.949         0.949
+ A2CSR          1.000         0.966         1.000         0.962         0.962
+ R2ATTUDE       0.944         0.909         0.944         0.920         0.920
+ R2MOTIVE       0.944         0.909         0.944         0.920         0.920
+ R2PRSIST       0.944         0.909         0.944         0.920         0.920
+ BINAGGR2       0.942         0.908         0.942         0.918         0.918
+ BINWITH2       0.942         0.908         0.942         0.918         0.918
+ BINHYP2        0.944         0.909         0.944         0.920         0.920
+ A3PPVT4W       0.882         0.848         0.882         0.846         0.846
+ A3WJAPW        0.879         0.844         0.879         0.842         0.842
+ A3CSR          0.882         0.848         0.882         0.846         0.846
+ KR3ATUDE       0.683         0.667         0.683         0.667         0.667
+ KR3MOTIV       0.683         0.667         0.683         0.667         0.667
+ KR3PRSST       0.683         0.667         0.683         0.667         0.667
+
+
+           Covariance Coverage
+              R1PRSIST      A2PPVT4W      A2WJAPW       A2CSR         R2ATTUDE
+              ________      ________      ________      ________      ________
+ R1PRSIST       0.962
+ A2PPVT4W       0.957         0.995
+ A2WJAPW        0.949         0.984         0.987
+ A2CSR          0.962         0.995         0.987         1.000
+ R2ATTUDE       0.920         0.938         0.931         0.944         0.944
+ R2MOTIVE       0.920         0.938         0.931         0.944         0.944
+ R2PRSIST       0.920         0.938         0.931         0.944         0.944
+ BINAGGR2       0.918         0.937         0.929         0.942         0.942
+ BINWITH2       0.918         0.937         0.929         0.942         0.942
+ BINHYP2        0.920         0.938         0.931         0.944         0.944
+ A3PPVT4W       0.846         0.877         0.871         0.882         0.835
+ A3WJAPW        0.842         0.873         0.868         0.879         0.833
+ A3CSR          0.846         0.877         0.871         0.882         0.835
+ KR3ATUDE       0.667         0.679         0.676         0.683         0.645
+ KR3MOTIV       0.667         0.679         0.676         0.683         0.645
+ KR3PRSST       0.667         0.679         0.676         0.683         0.645
+
+
+           Covariance Coverage
+              R2MOTIVE      R2PRSIST      BINAGGR2      BINWITH2      BINHYP2
+              ________      ________      ________      ________      ________
+ R2MOTIVE       0.944
+ R2PRSIST       0.944         0.944
+ BINAGGR2       0.942         0.942         0.942
+ BINWITH2       0.942         0.942         0.942         0.942
+ BINHYP2        0.944         0.944         0.942         0.942         0.944
+ A3PPVT4W       0.835         0.835         0.833         0.833         0.835
+ A3WJAPW        0.833         0.833         0.832         0.832         0.833
+ A3CSR          0.835         0.835         0.833         0.833         0.835
+ KR3ATUDE       0.645         0.645         0.643         0.643         0.645
+ KR3MOTIV       0.645         0.645         0.643         0.643         0.645
+ KR3PRSST       0.645         0.645         0.643         0.643         0.645
+
+
+           Covariance Coverage
+              A3PPVT4W      A3WJAPW       A3CSR         KR3ATUDE      KR3MOTIV
+              ________      ________      ________      ________      ________
+ A3PPVT4W       0.882
+ A3WJAPW        0.879         0.879
+ A3CSR          0.882         0.879         0.882
+ KR3ATUDE       0.589         0.585         0.589         0.683
+ KR3MOTIV       0.589         0.585         0.589         0.683         0.683
+ KR3PRSST       0.589         0.585         0.589         0.683         0.683
+
+
+           Covariance Coverage
+              KR3PRSST
+              ________
+ KR3PRSST       0.683
+
+
+UNIVARIATE PROPORTIONS AND COUNTS FOR CATEGORICAL VARIABLES
+
+    BINAGGR2
+      Category 1    0.478      248.795
+      Category 2    0.522      271.561
+    BINWITH2
+      Category 1    0.414      215.616
+      Category 2    0.586      304.740
+    BINHYP2
+      Category 1    0.399      208.113
+      Category 2    0.601      312.964
+
+
+SAMPLE STATISTICS
+
+
+     ESTIMATED SAMPLE STATISTICS
+
+
+           MEANS/INTERCEPTS/THRESHOLDS
+              A1PPVT4W      A1WJAPW       A1CSR         R1ATTUDE      R1MOTIVE
+              ________      ________      ________      ________      ________
+      1         5.545        28.300        42.430        54.845        42.702
+
+
+           MEANS/INTERCEPTS/THRESHOLDS
+              R1PRSIST      A2PPVT4W      A2WJAPW       A2CSR         R2ATTUDE
+              ________      ________      ________      ________      ________
+      1        31.282         4.596        31.289        48.047        57.650
+
+
+           MEANS/INTERCEPTS/THRESHOLDS
+              R2MOTIVE      R2PRSIST      BINAGGR2      BINWITH2      BINHYP2$
+              ________      ________      ________      ________      ________
+      1        51.339        42.387         1.920        -0.081        -0.124
+
+
+           MEANS/INTERCEPTS/THRESHOLDS
+              A3PPVT4W      A3WJAPW       A3CSR         KR3ATUDE      KR3MOTIV
+              ________      ________      ________      ________      ________
+      1         9.717        36.823        69.235        35.737        33.449
+
+
+           MEANS/INTERCEPTS/THRESHOLDS
+              KR3PRSST
+              ________
+      1        27.832
+
+
+           SLOPES
+              CHGENDER      P1RMOMED      A1CAGE        A2CAGE        P1PRGTYP
+              ________      ________      ________      ________      ________
+ A1PPVT4W      -0.325         0.340         0.208        -0.100         0.908
+ A1WJAPW       -0.458         0.291        -0.193         0.329        -2.391
+ A1CSR         -7.284         0.866         0.095         0.212        11.150
+ R1ATTUDE      -3.907         0.301         0.232        -0.143        10.228
+ R1MOTIVE      -3.791         1.070        -0.011         0.249         0.184
+ R1PRSIST      -5.648         0.596        -0.743         1.029        12.231
+ A2PPVT4W      -0.255         0.281         0.105         0.014         0.254
+ A2WJAPW       -0.222         0.426         0.071         0.050        -0.862
+ A2CSR         -8.154         1.826         0.052         0.332       -15.526
+ R2ATTUDE      -3.332        -0.031         0.801        -0.729        19.531
+ R2MOTIVE      -2.736         0.957         0.321        -0.052        28.280
+ R2PRSIST      -3.932        -0.017         0.523        -0.241         9.068
+ BINAGGR2       0.551         0.095        -0.151         0.146        -4.277
+ BINWITH2       0.277        -0.119        -0.023         0.013        -4.359
+ BINHYP2        0.494         0.047        -0.092         0.066        -3.949
+ A3PPVT4W      -0.093         0.344         0.153        -0.083         0.240
+ A3WJAPW       -0.053         0.515         0.209        -0.110         0.291
+ A3CSR         -6.049         2.585        -0.705         0.572         2.983
+ KR3ATUDE      -2.596        -0.709        -0.485         0.865         1.018
+ KR3MOTIV      -3.887        -0.330        -0.427         1.033         0.756
+ KR3PRSST      -4.279        -0.454        -0.051         0.530         0.413
+
+
+           SLOPES
+              P2PRGTYP      P3PRGTYP
+              ________      ________
+ A1PPVT4W      -0.850        -0.138
+ A1WJAPW        2.352         0.061
+ A1CSR         -7.785        -0.077
+ R1ATTUDE      -8.229        -1.999
+ R1MOTIVE       2.036        -1.964
+ R1PRSIST     -10.060        -0.533
+ A2PPVT4W       0.058        -0.041
+ A2WJAPW        1.014         0.190
+ A2CSR         14.692        -1.522
+ R2ATTUDE     -15.897        -2.028
+ R2MOTIVE     -25.109        -4.321
+ R2PRSIST      -5.938        -1.452
+ BINAGGR2       4.086         0.270
+ BINWITH2       4.068         0.278
+ BINHYP2        3.835         0.229
+ A3PPVT4W       0.240        -0.211
+ A3WJAPW        0.291        -0.202
+ A3CSR          2.991        -2.696
+ KR3ATUDE       1.022        -2.642
+ KR3MOTIV       0.758        -5.265
+ KR3PRSST       0.416        -1.285
+
+
+           CORRELATION MATRIX (WITH VARIANCES ON THE DIAGONAL)
+              A1PPVT4W      A1WJAPW       A1CSR         R1ATTUDE      R1MOTIVE
+              ________      ________      ________      ________      ________
+ A1PPVT4W       2.391
+ A1WJAPW        0.267         5.824
+ A1CSR          0.431         0.227       290.695
+ R1ATTUDE       0.143         0.111         0.196        73.939
+ R1MOTIVE       0.221         0.137         0.133         0.492        80.848
+ R1PRSIST       0.206         0.166         0.248         0.766         0.564
+ A2PPVT4W       0.661         0.243         0.321         0.135         0.200
+ A2WJAPW        0.552         0.369         0.318         0.163         0.240
+ A2CSR          0.255         0.165         0.378         0.253         0.131
+ R2ATTUDE       0.087         0.051         0.206         0.572         0.228
+ R2MOTIVE       0.184         0.164         0.283         0.352         0.539
+ R2PRSIST       0.155         0.123         0.303         0.519         0.303
+ BINAGGR2      -0.074         0.000        -0.252        -0.501        -0.066
+ BINWITH2      -0.051        -0.004        -0.143        -0.317        -0.550
+ BINHYP2       -0.190        -0.112        -0.282        -0.455        -0.145
+ A3PPVT4W       0.518         0.191         0.305         0.132         0.187
+ A3WJAPW        0.428         0.257         0.305         0.185         0.235
+ A3CSR          0.230         0.127         0.253         0.238         0.151
+ KR3ATUDE       0.092        -0.027         0.174         0.342         0.128
+ KR3MOTIV       0.169         0.185         0.162         0.224         0.313
+ KR3PRSST       0.198         0.101         0.260         0.287         0.158
+
+
+           CORRELATION MATRIX (WITH VARIANCES ON THE DIAGONAL)
+              R1PRSIST      A2PPVT4W      A2WJAPW       A2CSR         R2ATTUDE
+              ________      ________      ________      ________      ________
+ R1PRSIST      73.060
+ A2PPVT4W       0.210         1.752
+ A2WJAPW        0.274         0.628         3.643
+ A2CSR          0.278         0.314         0.324       274.720
+ R2ATTUDE       0.513         0.128         0.086         0.291        75.665
+ R2MOTIVE       0.450         0.194         0.224         0.265         0.547
+ R2PRSIST       0.647         0.196         0.214         0.295         0.768
+ BINAGGR2      -0.530        -0.089        -0.154        -0.266        -0.694
+ BINWITH2      -0.315        -0.054        -0.116        -0.125        -0.471
+ BINHYP2       -0.610        -0.222        -0.218        -0.184        -0.701
+ A3PPVT4W       0.225         0.659         0.466         0.298         0.124
+ A3WJAPW        0.279         0.480         0.598         0.314         0.142
+ A3CSR          0.280         0.231         0.256         0.325         0.232
+ KR3ATUDE       0.335         0.047         0.150         0.264         0.319
+ KR3MOTIV       0.315         0.128         0.263         0.226         0.171
+ KR3PRSST       0.326         0.152         0.278         0.342         0.291
+
+
+           CORRELATION MATRIX (WITH VARIANCES ON THE DIAGONAL)
+              R2MOTIVE      R2PRSIST      BINAGGR2      BINWITH2      BINHYP2
+              ________      ________      ________      ________      ________
+ R2MOTIVE      81.861
+ R2PRSIST       0.658        82.566
+ BINAGGR2      -0.374        -0.680
+ BINWITH2      -0.730        -0.487         0.348
+ BINHYP2       -0.551        -0.893         0.676         0.375
+ A3PPVT4W       0.188         0.170        -0.073        -0.062        -0.195
+ A3WJAPW        0.252         0.243        -0.097        -0.080        -0.199
+ A3CSR          0.254         0.233        -0.167        -0.102        -0.222
+ KR3ATUDE       0.169         0.290        -0.353        -0.186        -0.283
+ KR3MOTIV       0.299         0.236        -0.145        -0.306        -0.279
+ KR3PRSST       0.210         0.301        -0.362        -0.127        -0.322
+
+
+           CORRELATION MATRIX (WITH VARIANCES ON THE DIAGONAL)
+              A3PPVT4W      A3WJAPW       A3CSR         KR3ATUDE      KR3MOTIV
+              ________      ________      ________      ________      ________
+ A3PPVT4W       1.692
+ A3WJAPW        0.520         4.218
+ A3CSR          0.289         0.265       245.345
+ KR3ATUDE       0.100         0.143         0.309        93.557
+ KR3MOTIV       0.191         0.268         0.239         0.589       125.234
+ KR3PRSST       0.134         0.303         0.326         0.753         0.649
+
+
+           CORRELATION MATRIX (WITH VARIANCES ON THE DIAGONAL)
+              KR3PRSST
+              ________
+ KR3PRSST     117.379
+
+
+UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     A1PPVT4W             10.803      -0.531       3.700    0.18%       9.300     10.500     11.000
+             552.000       2.719       0.520      14.600    0.18%      11.300     12.200
+     A1WJAPW              38.202      -0.356      33.200    8.82%      35.900     37.700     38.200
+             533.000       6.221      -0.434      44.400    0.19%      38.800     40.300
+     A1CSR                63.160      -1.078       0.000    0.18%      50.000     60.000     66.000
+             552.000     309.120       0.639      81.000   14.31%      71.000     79.000
+     R1ATTUDE             52.124      -1.094      17.780    0.19%      45.170     53.000     53.000
+             531.000      79.848       0.584      60.830   30.32%      56.910     60.830
+     R1MOTIVE             52.666      -1.388       7.130    0.19%      46.570     51.820     54.450
+             531.000      87.656       2.202      62.340   18.46%      57.080     59.710
+     R1PRSIST             52.471      -1.098      15.280    0.19%      43.620     53.920     53.920
+             531.000      84.701       0.736      61.650   23.16%      56.500     61.650
+     A2PPVT4W             11.830      -0.330       5.700    0.18%      10.600     11.500     11.900
+             549.000       2.047       0.483      16.100    0.18%      12.200     13.100
+     A2WJAPW              39.943      -0.537      33.200    1.47%      38.200     39.300     40.300
+             545.000       4.006       1.178      45.800    0.18%      40.700     41.500
+     A2CSR                62.614      -0.756       4.000    0.18%      47.000     56.000     64.000
+             552.000     296.703      -0.191      81.000   17.03%      71.000     80.000
+     R2ATTUDE             52.481      -1.276      13.860    0.19%      45.170     53.000     56.910
+             521.000      84.403       1.264      60.830   30.90%      56.910     60.830
+     R2MOTIVE             52.930      -1.250      12.390    0.19%      43.940     51.820     54.450
+             521.000      93.440       1.219      62.340   22.65%      57.080     62.340
+     R2PRSIST             52.831      -1.166      20.440    0.38%      43.620     53.920     56.500
+             521.000      90.323       0.703      61.650   28.21%      59.080     61.650
+     A3PPVT4W             13.515      -0.591       5.400    0.21%      12.500     13.200     13.500
+             487.000       1.952       2.581      16.900    0.41%      13.800     14.600
+     A3WJAPW              42.628      -0.623      33.200    0.21%      40.700     41.900     42.700
+             485.000       4.726       1.057      48.100    0.21%      43.600     44.400
+     A3CSR                66.153      -1.075       6.000    0.41%      53.000     68.000     73.000
+             487.000     270.713       0.295      81.000   24.02%      77.000     81.000
+     KR3ATUDE             50.726      -1.113      13.860    0.53%      41.260     53.000     53.000
+             377.000      98.784       0.900      60.830   28.12%      56.910     60.830
+     KR3MOTIV             49.911      -0.938       9.760    0.27%      41.310     51.820     54.450
+             377.000     137.567       0.124      62.340   21.49%      57.080     62.340
+     KR3PRSST             49.531      -0.677      20.440    0.80%      38.470     48.770     51.350
+             377.000     124.575      -0.504      61.650   26.53%      56.500     61.650
+     CHGENDER              0.529      -0.116       0.000   46.38%       0.000      0.000      1.000
+             552.000       0.249      -1.987       1.000   53.62%       1.000      1.000
+     P1RMOMED              2.154       0.219       1.000   28.44%       1.000      2.000      2.000
+             552.000       0.802      -0.872       4.000    5.07%       2.000      3.000
+     A1CAGE               53.585      -0.371      37.000    0.18%      50.000     52.000     53.000
+             552.000      14.366       0.962      62.000    0.18%      54.000     57.000
+     A2CAGE               59.720       0.112      52.000    0.54%      56.000     58.000     59.000
+             552.000      12.358      -0.971      68.000    0.18%      61.000     63.000
+     P1PRGTYP              1.581      -0.329       1.000   46.20%       1.000      1.000      2.000
+             552.000       0.243      -1.892       2.000   53.80%       2.000      2.000
+     P2PRGTYP              1.586      -0.347       1.000   46.01%       1.000      1.000      2.000
+             552.000       0.243      -1.880       2.000   53.99%       2.000      2.000
+     P3PRGTYP              4.180       1.668       4.000   85.69%       4.000      4.000      4.000
+             552.000       0.147       0.782       5.000   14.31%       4.000      4.000
+
+     THE WEIGHT MATRIX PART OF VARIABLE A1CSR IS NON-INVERTIBLE.  THIS MAY
+     BE EITHER DUE TO THE SCALE OF THE VARIABLE OR THE VARIABLE BEING
+     DICHOTOMOUS BUT DECLARED AS CONTINUOUS.  CHECK YOUR DATA AND/OR RESCALE
+     THE VARIABLE OR RESPECIFY THE VARIABLE AS CATEGORICAL.
+
+     THE WEIGHT MATRIX PART OF VARIABLE R1ATTUDE IS NON-INVERTIBLE.  THIS MAY
+     BE EITHER DUE TO THE SCALE OF THE VARIABLE OR THE VARIABLE BEING
+     DICHOTOMOUS BUT DECLARED AS CONTINUOUS.  CHECK YOUR DATA AND/OR RESCALE
+     THE VARIABLE OR RESPECIFY THE VARIABLE AS CATEGORICAL.
+
+     THE WEIGHT MATRIX PART OF VARIABLE A2PPVT4W IS NON-INVERTIBLE.  THIS MAY
+     BE EITHER DUE TO THE SCALE OF THE VARIABLE OR THE VARIABLE BEING
+     DICHOTOMOUS BUT DECLARED AS CONTINUOUS.  CHECK YOUR DATA AND/OR RESCALE
+     THE VARIABLE OR RESPECIFY THE VARIABLE AS CATEGORICAL.
+
+     THE WEIGHT MATRIX PART OF VARIABLE A2WJAPW IS NON-INVERTIBLE.  THIS MAY
+     BE EITHER DUE TO THE SCALE OF THE VARIABLE OR THE VARIABLE BEING
+     DICHOTOMOUS BUT DECLARED AS CONTINUOUS.  CHECK YOUR DATA AND/OR RESCALE
+     THE VARIABLE OR RESPECIFY THE VARIABLE AS CATEGORICAL.
+
+     THE WEIGHT MATRIX PART OF VARIABLE BINAGGR2 IS NON-INVERTIBLE.  THIS MAY
+     BE DUE TO ONE OR MORE CATEGORIES HAVING TOO FEW OBSERVATIONS.  CHECK
+     YOUR DATA AND/OR COLLAPSE THE CATEGORIES FOR THIS VARIABLE.
+     PROBLEM INVOLVING THE REGRESSION OF BINAGGR2 ON P2PRGTYP. THE PROBLEM
+     MAY BE CAUSED BY AN EMPTY CELL IN THE BIVARIATE TABLE.
+
+     THE WEIGHT MATRIX PART OF VARIABLE BINWITH2 IS NON-INVERTIBLE.  THIS MAY
+     BE DUE TO ONE OR MORE CATEGORIES HAVING TOO FEW OBSERVATIONS.  CHECK
+     YOUR DATA AND/OR COLLAPSE THE CATEGORIES FOR THIS VARIABLE.
+     PROBLEM INVOLVING THE REGRESSION OF BINWITH2 ON P2PRGTYP. THE PROBLEM
+     MAY BE CAUSED BY AN EMPTY CELL IN THE BIVARIATE TABLE.
+
+     THE WEIGHT MATRIX PART OF VARIABLE BINHYP2 IS NON-INVERTIBLE.  THIS MAY
+     BE DUE TO ONE OR MORE CATEGORIES HAVING TOO FEW OBSERVATIONS.  CHECK
+     YOUR DATA AND/OR COLLAPSE THE CATEGORIES FOR THIS VARIABLE.
+     PROBLEM INVOLVING THE REGRESSION OF BINHYP2 ON P2PRGTYP. THE PROBLEM
+     MAY BE CAUSED BY AN EMPTY CELL IN THE BIVARIATE TABLE.
+
+     THE WEIGHT MATRIX PART OF VARIABLE A3PPVT4W IS NON-INVERTIBLE.  THIS MAY
+     BE EITHER DUE TO THE SCALE OF THE VARIABLE OR THE VARIABLE BEING
+     DICHOTOMOUS BUT DECLARED AS CONTINUOUS.  CHECK YOUR DATA AND/OR RESCALE
+     THE VARIABLE OR RESPECIFY THE VARIABLE AS CATEGORICAL.
+
+     THE WEIGHT MATRIX PART OF VARIABLE A3WJAPW IS NON-INVERTIBLE.  THIS MAY
+     BE EITHER DUE TO THE SCALE OF THE VARIABLE OR THE VARIABLE BEING
+     DICHOTOMOUS BUT DECLARED AS CONTINUOUS.  CHECK YOUR DATA AND/OR RESCALE
+     THE VARIABLE OR RESPECIFY THE VARIABLE AS CATEGORICAL.
+
+     THE WEIGHT MATRIX PART OF VARIABLE A3CSR IS NON-INVERTIBLE.  THIS MAY
+     BE EITHER DUE TO THE SCALE OF THE VARIABLE OR THE VARIABLE BEING
+     DICHOTOMOUS BUT DECLARED AS CONTINUOUS.  CHECK YOUR DATA AND/OR RESCALE
+     THE VARIABLE OR RESPECIFY THE VARIABLE AS CATEGORICAL.
+
+     THE WEIGHT MATRIX PART OF VARIABLE KR3ATUDE IS NON-INVERTIBLE.  THIS MAY
+     BE EITHER DUE TO THE SCALE OF THE VARIABLE OR THE VARIABLE BEING
+     DICHOTOMOUS BUT DECLARED AS CONTINUOUS.  CHECK YOUR DATA AND/OR RESCALE
+     THE VARIABLE OR RESPECIFY THE VARIABLE AS CATEGORICAL.
+
+     THE WEIGHT MATRIX PART OF VARIABLE KR3MOTIV IS NON-INVERTIBLE.  THIS MAY
+     BE EITHER DUE TO THE SCALE OF THE VARIABLE OR THE VARIABLE BEING
+     DICHOTOMOUS BUT DECLARED AS CONTINUOUS.  CHECK YOUR DATA AND/OR RESCALE
+     THE VARIABLE OR RESPECIFY THE VARIABLE AS CATEGORICAL.
+
+     THE WEIGHT MATRIX PART OF VARIABLE KR3PRSST IS NON-INVERTIBLE.  THIS MAY
+     BE EITHER DUE TO THE SCALE OF THE VARIABLE OR THE VARIABLE BEING
+     DICHOTOMOUS BUT DECLARED AS CONTINUOUS.  CHECK YOUR DATA AND/OR RESCALE
+     THE VARIABLE OR RESPECIFY THE VARIABLE AS CATEGORICAL.
+
+
+
+
+     Beginning Time:  09:04:49
+        Ending Time:  09:04:50
+       Elapsed Time:  00:00:01
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2014 Muthen & Muthen

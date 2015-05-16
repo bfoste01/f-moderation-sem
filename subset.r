@@ -1,39 +1,33 @@
-###########################################
-# Data cleaning, transformation, etc. 
-###########################################
-# Select out 4-year olds
-s1 <- FACES2006_missing[FACES2006_missing$COHORT == 4, ]
-row.names(s1) <- NULL
-#---------------------------------------------
-#Select out English speakers based on Engish Home Language
-s2<- s1[s1$P1HHLAN2 == 0,] #n=881
+#=========================================================================================================#
+#--------------------------------------Subset for 4-year-olds Graders-------------------------------------#
+#=========================================================================================================#
+library(plyr)
+library(MplusAutomation)
+#---------------------------------Select out 4-year-olds--------------------------------------------------#
+s1.a<-subset(FACES2006_missing, COHORT==4)
+row.names(s1.a) <- NULL
+#--------------------------Select out English speakers based on Engish Home Language----------------------#
+s1.b<-subset(s1.a, P1HHLAN2==0)
+row.names(s1.b) <- NULL
+s2<-subset(s1.b, P3PRGTYP>=4)
+row.names(s2) <- NULL
 #s2b<- s1[s1$P1RHHLNG == 0,] #n=881 Using simple language majority has same sample size
-#Subset for panel model 
-long.invariance <- subset(s2, 
-   select = c(CHILDID, A1PPVT4R, A1WJAPR, A1WJLWR, R1BAGGR,  R1BWITH, 
-  R1BHYPER ,R1ATTUDE, R1MOTIVE, R1PRSIST, A2PPVT4R, A2WJAPR, A2WJLWR,
-  R2BAGGR, R2BWITH, R2BHYPER ,R2ATTUDE, R2MOTIVE, R2PRSIST,
-  A3PPVT4R, A3WJAPR, A3WJLWR, A4PPVT4R, A4WJAPR, A4WJLWR, 
-  KR3ATUDE, KR3MOTIV, KR3PRSST, KR3BAGGR, KR3BHYPE, KR3BWITH,
-  STRAT, PSU, T1_ID, T2_ID, T3_ID, PRA12OTW, 
-  A1CAGE, A2CAGE, A3CAGE, A4CAGE, CHGENDER,P1RMOMED,
-  O2CLSSCD, O2CLSSIS, O2CLSSLM, O2CLSSQF,
-  CLS1_ID, CLS2_ID, CLS3_ID))
-row.names(long.invariance) <- NULL
-#Need to drop any case with missing data for longitudinal weights
-long.invariance <- long.invariance[complete.cases(long.invariance$PRA12OTW),]
-row.names(long.invariance) <- NULL
-#####BEH SUBSETS
 long.invariance.2 <- subset(s2, 
-                          select = c(CHILDID, A1PPVT4R, A1WJAPR, A1WJLWR, R1BAGGR,  R1BWITH, 
-                                     R1BHYPER ,R1ATTUDE, R1MOTIVE, R1PRSIST, A2PPVT4R, A2WJAPR, A2WJLWR,
-                                     R2BAGGR, R2BWITH, R2BHYPER ,R2ATTUDE, R2MOTIVE, R2PRSIST,
-                                     A3PPVT4R, A3WJAPR, A3WJLWR, A4PPVT4R, A4WJAPR, A4WJLWR, 
-                                     KR3ATUDE, KR3MOTIV, KR3PRSST, KR3BAGGR, KR3BHYPE, KR3BWITH,
-                                     STRAT, PSU, T1_ID, T2_ID, T3_ID, PRA12OTW, 
-                                     A1CAGE, A2CAGE, A3CAGE, A4CAGE, CHGENDER,P1RMOMED,
-                                     O2CLSSCD, O2CLSSIS, O2CLSSLM, O2CLSSQF,
-                                     CLS1_ID, CLS2_ID, CLS3_ID))
+select = c(A1PPVT4W, A1WJAPW, A1WJLWW, A1CSR, A1ECMIRT, A1WJSW,
+  R1ATTUDE, R1MOTIVE, R1PRSIST,
+  A2PPVT4W, A2WJAPW, A2WJLWW, A2CSR, A2ECMIRT, A2WJSW,
+  R2ATTUDE, R2MOTIVE, R2PRSIST,
+  A3PPVT4W, A3WJAPW, A3WJLWW, A3CSR, A3ECMIRT, A3WJSW,
+  KR3ATUDE, KR3MOTIV, KR3PRSST,
+  R1TPLBS, R2TPLBS, KR3TPLBS,
+  STRAT, PSU, PRA12OTW, CHGENDER, P1RMOMED, P1RCAGE, CRACE, 
+  P1PRGTYP, P2PRGTYP, P3PRGTYP,
+  O2CLSSCD, O2CLSSIS, O2CLSSLM, O2CLSSQF, CLS1_ID,
+  CLS2_ID, CLS3_ID,
+  R1BAGGR,  R1BWITH, R1BHYPER ,R1ATTUDE,
+  R2BAGGR, R2BWITH, R2BHYPER,
+ KR3BAGGR, KR3BHYPE, KR3BWITH))
+#---------------------------------Make Binary Variables---------------------------------------------------#
 #for problem BeH
 long.invariance.2$BINAGGR1<-ifelse(long.invariance.2$R1BAGGR>0,1,0)
 long.invariance.2$BINWITH1<-ifelse(long.invariance.2$R1BWITH>0,1,0)
@@ -46,16 +40,8 @@ long.invariance.2$BINWITH3<-ifelse(long.invariance.2$KR3BWITH>0,1,0)
 long.invariance.2$BINHYP3<-ifelse(long.invariance.2$KR3BHYPE>0,1,0)
 long.invariance.2<-long.invariance.2[complete.cases(long.invariance.2$PRA12OTW),]
 row.names(long.invariance.2) <- NULL
-#x.omit <- na.omit(x) # listwise deletion of missing
-# Note. These numbers vary slightly from what are in the manual, in that there are more students, by 
-# just a few in each category. 
-# Select out variables of interest
-###NOTE? Sort out by KG year?
-
-"P2HHLAN2", "P3HHLAN2", "T2A00_1", "T3A00_1"
-"P2RMOMED", "P3RMOMED"
-#Years teahcer experience?
-#Child age?
-
+#-------------------------------Write the Data-----------------------------------------------------------#
+s2.b<-long.invariance.2[complete.cases(long.invariance.2$PRA12OTW),]
+prepareMplusData(s2.b, "moderation.4.dat")
 
 
